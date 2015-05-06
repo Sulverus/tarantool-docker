@@ -20,4 +20,4 @@ ENV LANGUAGE en_US.UTF-8
 
 EXPOSE 3301
 # Install tarantool pack
-RUN apt-get install -y --force-yes tarantool tarantool-dev tarantool-modules tarantool-expirationd tarantool-queue tarantool-http tarantool-shard
+RUN apt-get install -y --force-yes tarantool tarantool-dev tarantool-expirationd tarantool-queue tarantool-http tarantool-shard
