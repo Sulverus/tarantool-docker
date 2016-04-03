@@ -2,8 +2,8 @@ FROM debian:jessie
 
 # Add tarantool repo
 RUN touch /etc/apt/sources.list.d/tarantool.list
-RUN echo 'deb http://tarantool.org/dist/master/debian/ jessie main' >> /etc/apt/sources.list.d/tarantool.list
-RUN echo 'deb-src http://tarantool.org/dist/master/debian/ jessie main' >> /etc/apt/sources.list.d/tarantool.list
+RUN echo 'deb http://tarantool.org/dist/1.6/debian/ jessie main' >> /etc/apt/sources.list.d/tarantool.list
+RUN echo 'deb-src http://tarantool.org/dist/1.6/debian/ jessie main' >> /etc/apt/sources.list.d/tarantool.list
 
 RUN apt-get update
 

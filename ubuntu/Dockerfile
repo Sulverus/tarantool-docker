@@ -2,8 +2,8 @@ FROM ubuntu:trusty
 
 # Add tarantool repo
 RUN touch /etc/apt/sources.list.d/tarantool.list
-RUN echo 'deb http://tarantool.org/dist/master/ubuntu/ trusty main' >> /etc/apt/sources.list.d/tarantool.list
-RUN echo 'deb-src http://tarantool.org/dist/master/ubuntu/ trusty main' >> /etc/apt/sources.list.d/tarantool.list
+RUN echo 'deb http://tarantool.org/dist/1.6/ubuntu/ trusty main' >> /etc/apt/sources.list.d/tarantool.list
+RUN echo 'deb-src http://tarantool.org/dist/1.6/ubuntu/ trusty main' >> /etc/apt/sources.list.d/tarantool.list
 
 RUN apt-get update
 

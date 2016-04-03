@@ -4,7 +4,7 @@ FROM centos
 RUN touch /etc/yum.repos.d/tarantool.repo
 RUN echo '[tarantool]' >> /etc/yum.repos.d/tarantool.repo 
 RUN echo 'name=Centos-$releasever - Tarantool' >> /etc/yum.repos.d/tarantool.repo
-RUN echo 'baseurl=http://tarantool.org/dist/master/centos/$releasever/os/$basearch/' >> /etc/yum.repos.d/tarantool.repo
+RUN echo 'baseurl=http://tarantool.org/dist/1.6/centos/$releasever/os/$basearch/' >> /etc/yum.repos.d/tarantool.repo
 RUN echo 'enabled=1' >> /etc/yum.repos.d/tarantool.repo
 RUN echo 'gpgcheck=0' >> /etc/yum.repos.d/tarantool.repo
 

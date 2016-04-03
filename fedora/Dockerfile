@@ -4,7 +4,7 @@ FROM fedora:21
 RUN touch /etc/yum.repos.d/tarantool.repo
 RUN echo '[tarantool]' >> /etc/yum.repos.d/tarantool.repo 
 RUN echo 'name=Centos-$releasever - Tarantool' >> /etc/yum.repos.d/tarantool.repo
-RUN echo 'baseurl=http://tarantool.org/dist/master/fedora/$releasever/$basearch/' >> /etc/yum.repos.d/tarantool.repo
+RUN echo 'baseurl=http://tarantool.org/dist/1.6/fedora/$releasever/$basearch/' >> /etc/yum.repos.d/tarantool.repo
 RUN echo 'enabled=1' >> /etc/yum.repos.d/tarantool.repo
 RUN echo 'gpgcheck=0' >> /etc/yum.repos.d/tarantool.repo
 
