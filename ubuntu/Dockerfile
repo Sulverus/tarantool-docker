@@ -15,4 +15,4 @@ ENV LC_ALL C.UTF-8
 
 EXPOSE 3301
 # Install tarantool pack
-RUN apt-get install -y --force-yes tarantool tarantool-dev tarantool-expirationd tarantool-queue tarantool-http tarantool-connpool tarantool-shard
+RUN apt-get install -y --force-yes tarantool tarantool-dev tarantool-expirationd tarantool-queue tarantool-http tarantool-connpool tarantool-shard tarantool-cbench tarantool-avro tarantool-pg tarantool-mysql tarantool-memcached

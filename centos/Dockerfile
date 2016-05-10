@@ -14,4 +14,4 @@ RUN localedef -f UTF-8 -i ru_RU C.UTF-8
 
 EXPOSE 3301
 # Install tarantool pack
-RUN yum install -y tarantool tarantool-devel tarantool-expirationd tarantool-queue tarantool-http tarantool-pool tarantool-shard tarantool-connpool
+RUN yum install -y tarantool tarantool-devel tarantool-expirationd tarantool-queue tarantool-http tarantool-pool tarantool-shard tarantool-connpool tarantool-cbench tarantool-avro tarantool-pg tarantool-mysql tarantool-memcached
