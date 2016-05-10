@@ -1,4 +1,5 @@
 FROM ubuntu:trusty
+RUN apt-get update
 
 # Add tarantool repo
 RUN touch /etc/apt/sources.list.d/tarantool.list
