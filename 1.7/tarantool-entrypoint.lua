@@ -1,6 +1,9 @@
 #!/usr/bin/env tarantool
 
 local slab_alloc_arena = os.getenv('TARANTOOL_SLAB_ALLOC_ARENA')
+local slab_alloc_factor = os.getenv('TARANTOOL_SLAB_ALLOC_FACTOR')
+local slab_alloc_maximal = os.getenv('TARANTOOL_SLAB_ALLOC_MAXIMAL')
+local slab_alloc_minimal = os.getenv('TARANTOOL_SLAB_ALLOC_MINIMAL')
 local admin_password = os.getenv('TARANTOOL_ADMIN_PASSWORD')
 local listen_port = tonumber(os.getenv('TARANTOOL_PORT'))
 
@@ -17,8 +20,23 @@ if slab_alloc_arena == nil then
     slab_alloc_arena = 0.5
 end
 
+if slab_alloc_factor == nil then
+    slab_alloc_factor = 1.1
+end
+
+if slab_alloc_maximal == nil then
+    slab_alloc_maximal = 1048576
+end
+
+if slab_alloc_minimal == nil then
+    slab_alloc_minimal = 16
+end
+
 box.cfg {
     slab_alloc_arena = slab_alloc_arena;
+    slab_alloc_factor = slab_alloc_factor;
+    slab_alloc_maximal = slab_alloc_maximal;
+    slab_alloc_minimal = slab_alloc_minimal;
     wal_mode = 'write';
     listen = listen_port;
     work_dir = '/var/lib/tarantool';
