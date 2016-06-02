@@ -13,4 +13,10 @@ if [ "$1" = 'tarantool' -a "$(id -u)" = '0' ]; then
     exec su-exec tarantool "$0" "$@"
 fi
 
+# entry point wraps the passed script to do basic setup
+if [ "$1" = 'tarantool' ]; then
+    shift
+    exec tarantool "/usr/local/bin/tarantool-entrypoint.lua" "$@"
+fi
+
 exec "$@"

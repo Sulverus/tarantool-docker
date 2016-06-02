@@ -46,10 +46,16 @@ RUN set -x \
     && rm -r /usr/src/tarantool \
     && apk del .build-deps
 
-RUN mkdir /data && chown tarantool:tarantool /data
-VOLUME /var/lib/tarantool
-WORKDIR /var/lib/tarantool
+RUN mkdir -p /var/lib/tarantool \
+    && chown tarantool:tarantool /var/lib/tarantool \
+    && mkdir -p /opt/tarantool \
+    && chown tarantool:tarantool /opt/tarantool
 
+VOLUME /var/lib/tarantool
+VOLUME /opt/tarantool
+WORKDIR /opt/tarantool
+
+COPY tarantool-entrypoint.lua /usr/local/bin/
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]
