@@ -8,8 +8,19 @@ local admin_password = os.getenv('TARANTOOL_ADMIN_PASSWORD')
 local listen_port = tonumber(os.getenv('TARANTOOL_PORT'))
 
 if admin_password == nil then
-    print("Error: password option is not specified: TARANTOOL_ADMIN_PASSWORD")
-    os.exit(1)
+    admin_password = ""
+
+    warn_str = [[****************************************************
+WARNING: No password has been set for the database.
+         This will allow anyone with access to the
+         Tarantool port to access your database. In
+         Docker's default configuration, this is
+         effectively any other container on the same
+         system.
+         Use "-e TARANTOOL_ADMIN_PASSWORD=password"
+         to set it in "docker run".
+****************************************************]]
+    print(warn_str)
 end
 
 if listen_port == nil then
