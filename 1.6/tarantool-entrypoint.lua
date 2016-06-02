@@ -6,6 +6,7 @@ local slab_alloc_maximal = os.getenv('TARANTOOL_SLAB_ALLOC_MAXIMAL')
 local slab_alloc_minimal = os.getenv('TARANTOOL_SLAB_ALLOC_MINIMAL')
 local admin_password = os.getenv('TARANTOOL_ADMIN_PASSWORD')
 local listen_port = tonumber(os.getenv('TARANTOOL_PORT'))
+local replication_source = os.getenv('TARANTOOL_REPLICATION_SOURCE')
 
 if admin_password == nil then
     admin_password = ""
@@ -43,6 +44,14 @@ if slab_alloc_minimal == nil then
     slab_alloc_minimal = 16
 end
 
+replication_source_table = {}
+if replication_source ~= nil then
+    for addr in string.gmatch(replication_source, "[^,]+") do
+        table.insert(replication_source_table,
+                     "admin:" .. admin_password .. "@" .. addr)
+    end
+end
+
 box.cfg {
     slab_alloc_arena = slab_alloc_arena;
     slab_alloc_factor = slab_alloc_factor;
@@ -51,6 +60,7 @@ box.cfg {
     wal_mode = 'write';
     listen = listen_port;
     work_dir = '/var/lib/tarantool';
+    replication_source = replication_source_table;
 }
 
 box.schema.user.passwd("admin", admin_password)
