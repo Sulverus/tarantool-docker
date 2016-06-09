@@ -37,7 +37,12 @@ RUN set -x \
     && mkdir -p /usr/src/tarantool \
     && tar -xzf tarantool.tar.gz -C /usr/src/tarantool --strip-components=1 \
     && rm tarantool.tar.gz \
-    && (cd /usr/src/tarantool; cmake .) \
+    && (cd /usr/src/tarantool; \
+       cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo\
+             -DENABLE_BUNDLED_LIBYAML:BOOL=OFF\
+             -DENABLE_BACKTRACE:BOOL=ON\
+             -DENABLE_DIST:BOOL=ON\
+             .) \
     && make -C /usr/src/tarantool \
     && make -C /usr/src/tarantool install \
     && rm -r /usr/src/tarantool \

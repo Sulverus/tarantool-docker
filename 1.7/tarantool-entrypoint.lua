@@ -29,7 +29,7 @@ if listen_port == nil then
 end
 
 if slab_alloc_arena == nil then
-    slab_alloc_arena = 0.5
+    slab_alloc_arena = 1.0
 end
 
 if slab_alloc_factor == nil then

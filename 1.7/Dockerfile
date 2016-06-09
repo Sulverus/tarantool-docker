@@ -40,7 +40,12 @@ RUN set -x \
     && git -C /usr/src/tarantool checkout $TARANTOOL_COMMIT \
     && git -C /usr/src/tarantool submodule update \
     && echo "$TARANTOOL_VERSION" > /usr/src/tarantool/VERSION \
-    && (cd /usr/src/tarantool; cmake .) \
+    && (cd /usr/src/tarantool; \
+       cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo\
+             -DENABLE_BUNDLED_LIBYAML:BOOL=OFF\
+             -DENABLE_BACKTRACE:BOOL=ON\
+             -DENABLE_DIST:BOOL=ON\
+             .) \
     && make -C /usr/src/tarantool \
     && make -C /usr/src/tarantool install \
     && rm -r /usr/src/tarantool \
