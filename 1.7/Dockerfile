@@ -1,4 +1,4 @@
-FROM alpine:3.3
+FROM alpine:3.4
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN addgroup -S tarantool && adduser -S -G tarantool tarantool
@@ -9,6 +9,7 @@ RUN apk add --no-cache 'su-exec>=0.2'
 ENV TARANTOOL_VERSION 1.7
 ENV TARANTOOL_DOWNLOAD_URL https://github.com/tarantool/tarantool.git
 ENV TARANTOOL_COMMIT f6e6918
+ENV TARANTOOL_INSTALL_LUADIR /usr/local/share/tarantool
 
 RUN set -x \
     && apk add --no-cache --virtual .run-deps \
@@ -50,6 +51,85 @@ RUN set -x \
     && make -C /usr/src/tarantool install \
     && rm -r /usr/src/tarantool \
     && apk del .build-deps
+
+
+RUN set -x \
+    && apk add --no-cache --virtual .run-deps \
+        mariadb-client-libs \
+        libpq \
+    && apk add --no-cache --virtual .build-deps \
+        git \
+        cmake \
+        make \
+        gcc \
+        g++ \
+        postgresql-dev \
+    && : "---------- expirationd ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/expirationd.git) \
+    && cp -r /usr/src/expirationd/expirationd.lua $TARANTOOL_INSTALL_LUADIR \
+    && rm -rf /usr/src/expirationd \
+    && : "---------- queue ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/queue.git) \
+    && mkdir -p $TARANTOOL_INSTALL_LUADIR/queue/abstract/driver \
+    && cp -r /usr/src/queue/queue/*.lua $TARANTOOL_INSTALL_LUADIR/queue \
+    && cp -r /usr/src/queue/queue/abstract/*.lua $TARANTOOL_INSTALL_LUADIR/queue/abstract \
+    && cp -r /usr/src/queue/queue/abstract/driver/*.lua \
+             $TARANTOOL_INSTALL_LUADIR/queue/abstract/driver \
+    && rm -rf /usr/src/queue \
+    && : "---------- http ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/http.git) \
+    && (cd /usr/src/http; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
+    && (cd /usr/src/http; make) \
+    && (cd /usr/src/http; make install) \
+    && rm -rf /usr/src/http \
+    && : "---------- connpool ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/connpool.git) \
+    && cp -r /usr/src/connpool/connpool.lua $TARANTOOL_INSTALL_LUADIR \
+    && rm -rf /usr/src/connpool \
+    && : "---------- shard ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/shard.git) \
+    && cp -r /usr/src/shard/shard.lua $TARANTOOL_INSTALL_LUADIR \
+    && rm -rf /usr/src/shard \
+    && : "---------- msgpuck ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/msgpuck.git) \
+    && (cd /usr/src/msgpuck; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
+    && (cd /usr/src/msgpuck; make) \
+    && (cd /usr/src/msgpuck; make install) \
+    && rm -rf /usr/src/cbench \
+    && : "---------- cbench ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/cbench.git) \
+    && (cd /usr/src/cbench; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
+    && (cd /usr/src/cbench; make) \
+    && (cd /usr/src/cbench; make install) \
+    && rm -rf /usr/src/cbench \
+    && : "---------- avro ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/tarantool-avro.git) \
+    && (cd /usr/src/tarantool-avro; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
+    && (cd /usr/src/tarantool-avro; make) \
+    && (cd /usr/src/tarantool-avro; make install) \
+    && rm -rf /usr/src/tarantool-avro \
+    && : "---------- pg ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/pg.git) \
+    && (cd /usr/src/pg; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
+    && (cd /usr/src/pg; make) \
+    && (cd /usr/src/pg; make install) \
+    && rm -rf /usr/src/pg \
+    && : "---------- mysql ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/mysql.git) \
+    && (cd /usr/src/mysql; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
+    && (cd /usr/src/mysql; make) \
+    && (cd /usr/src/mysql; make install) \
+    && rm -rf /usr/src/mysql \
+    && : "---------- memcached ----------" \
+    && (cd /usr/src; git clone https://github.com/tarantool/memcached.git) \
+    && git -C /usr/src/memcached submodule update --init --recursive \
+    && (cd /usr/src/memcached; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
+    && (cd /usr/src/memcached; make) \
+    && (cd /usr/src/memcached; make install) \
+    && rm -rf /usr/src/memcached \
+    && : "---------- remove build deps ----------" \
+    && apk del .build-deps
+
 
 RUN mkdir -p /var/lib/tarantool \
     && chown tarantool:tarantool /var/lib/tarantool \
