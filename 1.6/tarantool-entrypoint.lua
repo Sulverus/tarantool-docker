@@ -4,8 +4,10 @@ local fio = require('fio')
 local errno = require('errno')
 local fun = require('fun')
 local urilib = require('uri')
+local console = require('console')
 
 local TARANTOOL_DEFAULT_PORT = 3301
+local CONSOLE_SOCKET_PATH = 'unix/:/var/run/tarantool/tarantool.sock'
 
 local slab_alloc_arena = os.getenv('TARANTOOL_SLAB_ALLOC_ARENA') or 1.0
 local slab_alloc_factor = os.getenv('TARANTOOL_SLAB_ALLOC_FACTOR') or 1.1
@@ -144,6 +146,7 @@ WARNING: A password for guest user has been specified.
     end
 end
 
+console.listen(CONSOLE_SOCKET_PATH)
 
 -- re-run the script passed as parameter with all arguments that follow
 execute_script = arg[1]

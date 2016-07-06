@@ -135,7 +135,9 @@ RUN set -x \
 RUN mkdir -p /var/lib/tarantool \
     && chown tarantool:tarantool /var/lib/tarantool \
     && mkdir -p /opt/tarantool \
-    && chown tarantool:tarantool /opt/tarantool
+    && chown tarantool:tarantool /opt/tarantool \
+    && mkdir -p /var/run/tarantool \
+    && chown tarantool:tarantool /var/run/tarantool
 
 VOLUME /var/lib/tarantool
 VOLUME /opt/tarantool
