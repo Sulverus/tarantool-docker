@@ -1,16 +1,14 @@
 FROM alpine:3.4
 MAINTAINER mail@racktear.com
 
-# add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-RUN addgroup -S tarantool && adduser -S -G tarantool tarantool
+RUN addgroup -S tarantool \
+    && adduser -S -G tarantool tarantool \
+    && apk add --no-cache 'su-exec>=0.2'
 
-# grab su-exec for easy step-down from root
-RUN apk add --no-cache 'su-exec>=0.2'
-
-ENV TARANTOOL_VERSION 1.7
-ENV TARANTOOL_DOWNLOAD_URL https://github.com/tarantool/tarantool.git
-ENV TARANTOOL_COMMIT 076a842
-ENV TARANTOOL_INSTALL_LUADIR /usr/local/share/tarantool
+ENV TARANTOOL_VERSION=1.7 \
+    TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
+    TARANTOOL_COMMIT=076a842 \
+    TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool
 
 RUN set -x \
     && apk add --no-cache --virtual .run-deps \
