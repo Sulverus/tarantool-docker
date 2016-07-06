@@ -142,6 +142,8 @@ WORKDIR /opt/tarantool
 
 COPY tarantool-entrypoint.lua /usr/local/bin/
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY console /usr/local/bin/
+
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]
 
