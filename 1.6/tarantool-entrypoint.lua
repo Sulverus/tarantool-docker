@@ -9,86 +9,78 @@ local console = require('console')
 local TARANTOOL_DEFAULT_PORT = 3301
 local CONSOLE_SOCKET_PATH = 'unix/:/var/run/tarantool/tarantool.sock'
 
-local slab_alloc_arena = os.getenv('TARANTOOL_SLAB_ALLOC_ARENA') or 1.0
-local slab_alloc_factor = os.getenv('TARANTOOL_SLAB_ALLOC_FACTOR') or 1.1
-local slab_alloc_maximal = os.getenv('TARANTOOL_SLAB_ALLOC_MAXIMAL') or 1048576
-local slab_alloc_minimal = os.getenv('TARANTOOL_SLAB_ALLOC_MINIMAL') or 16
-local user_name = os.getenv('TARANTOOL_USER_NAME') or 'guest'
-local user_password = os.getenv('TARANTOOL_USER_PASSWORD')
-local listen_port = tonumber(os.getenv('TARANTOOL_PORT')) or TARANTOOL_DEFAULT_PORT
-local replication_source = os.getenv('TARANTOOL_REPLICATION_SOURCE')
-local wal_mode = os.getenv('TARANTOOL_WAL_MODE') or 'write'
+local orig_cfg = box.cfg
 
-local work_dir = '/var/lib/tarantool'
-local snap_filename = "00000000000000000000.snap"
-local snap_path = work_dir..'/'..snap_filename
+local function wrapper_cfg(override)
+    cfg = {}
+    cfg.slab_alloc_arena = os.getenv('TARANTOOL_SLAB_ALLOC_ARENA') or
+        override.slab_alloc_arena
+    cfg.slab_alloc_factor = os.getenv('TARANTOOL_SLAB_ALLOC_FACTOR') or
+        override.slab_alloc_factor
+    cfg.slab_alloc_maximal = os.getenv('TARANTOOL_SLAB_ALLOC_MAXIMAL') or
+        override.slab_alloc_maximal
+    cfg.slab_alloc_minimal = os.getenv('TARANTOOL_SLAB_ALLOC_MINIMAL') or
+        override.slab_alloc_minimal
+    cfg.listen = tonumber(os.getenv('TARANTOOL_PORT')) or
+        override.listen or TARANTOOL_DEFAULT_PORT
+    cfg.wal_mode = os.getenv('TARANTOOL_WAL_MODE') or
+        override.wal_mode
+    cfg.wal_dir = override.wal_dir or '/var/lib/tarantool'
+    cfg.snap_dir = override.snap_dir or '/var/lib/tarantool'
+    cfg.pid_file = override.pid_file or '/var/run/tarantool/tarantool.pid'
 
-local first_run = false
+    local user_name = os.getenv('TARANTOOL_USER_NAME') or 'guest'
+    local user_password = os.getenv('TARANTOOL_USER_PASSWORD')
 
-if fio.stat(snap_path) == nil and errno() == errno.ENOENT then
-    first_run = true
-end
+    local work_dir = '/var/lib/tarantool'
+    local snap_filename = "00000000000000000000.snap"
+    local snap_path = work_dir..'/'..snap_filename
 
-local replication_source_table = {}
-if replication_source ~= nil then
-    for uri in string.gmatch(replication_source, "[^,]+") do
+    local first_run = false
 
-        local parsed_uri = urilib.parse(uri)
-        if parsed_uri == nil then
-            error("Incorrect replication source URI format: '"..uri.."'")
-        end
-        local host = parsed_uri.host
-        local port = parsed_uri.service or TARANTOOL_DEFAULT_PORT
-        local user = parsed_uri.login or user_name
-        local password = parsed_uri.password or user_password
-
-        if user == 'guest' then
-            replication_source = string.format("%s:%s", host, port)
-        elseif password == nil then
-            replication_source = string.format("%s:@%s:%s", user, host, port)
-        else
-            replication_source = string.format("%s:%s@%s:%s", user, password,
-                                               host, port)
-        end
-
-        table.insert(replication_source_table, replication_source)
+    if fio.stat(snap_path) == nil and errno() == errno.ENOENT then
+        first_run = true
     end
-end
 
+    local replication_source = os.getenv('TARANTOOL_REPLICATION_SOURCE')
+    local replication_source_table = {}
+    if replication_source ~= nil then
+        for uri in string.gmatch(replication_source, "[^,]+") do
 
+            local parsed_uri = urilib.parse(uri)
+            if parsed_uri == nil then
+                error("Incorrect replication source URI format: '"..uri.."'")
+            end
+            local host = parsed_uri.host
+            local port = parsed_uri.service or TARANTOOL_DEFAULT_PORT
+            local user = parsed_uri.login or user_name
+            local password = parsed_uri.password or user_password
 
-box.cfg {
-    slab_alloc_arena = slab_alloc_arena;
-    slab_alloc_factor = slab_alloc_factor;
-    slab_alloc_maximal = slab_alloc_maximal;
-    slab_alloc_minimal = slab_alloc_minimal;
-    wal_mode = wal_mode;
-    listen = listen_port;
-    work_dir = work_dir;
-    replication_source = replication_source_table;
-}
+            if user == 'guest' then
+                replication_source = string.format("%s:%s", host, port)
+            elseif password == nil then
+                replication_source = string.format("%s:@%s:%s", user, host, port)
+            else
+                replication_source = string.format("%s:%s@%s:%s", user, password,
+                                                   host, port)
+            end
 
-local min_replica_uuid = nil
-if box.info.replication.status ~= 'off' then
-    local uuids
-    uuids = fun.map(function(replica)
-            return replica.uuid
-                    end,
-        box.info.replication):totable()
+            table.insert(replication_source_table, replication_source)
+        end
+    end
 
-    table.sort(uuids)
-    min_replica_uuid = uuids[1]
-end
+    cfg.replication_source = replication_source_table
 
-if first_run and (#box.info.replication == 0 or
-                  box.info.server.uuid == min_replica_uuid) then
+    orig_cfg(cfg)
 
-    print("Initializing database")
+    box.once('tarantool-entrypoint', function ()
+        if first_run then
+            print("Initializing database")
 
-    if user_name ~= 'guest' and user_password == nil then
-        user_password = ""
+            if user_name ~= 'guest' and user_password == nil then
+                user_password = ""
 
-        warn_str = [[****************************************************
+                warn_str = [[****************************************************
 WARNING: No password has been set for the database.
          This will allow anyone with access to the
          Tarantool port to access your database. In
@@ -98,11 +90,11 @@ WARNING: No password has been set for the database.
          Use "-e TARANTOOL_USER_PASSWORD=password"
          to set it in "docker run".
 ****************************************************]]
-        print(warn_str)
-    end
+                print(warn_str)
+            end
 
-    if user_name == 'guest' and user_password == nil then
-        warn_str = [[****************************************************
+            if user_name == 'guest' and user_password == nil then
+                warn_str = [[****************************************************
 WARNING: 'guest' is chosen as primary user.
          Since it is not allowed to set a password for
          guest user, your instance will be accessible
@@ -112,13 +104,13 @@ WARNING: 'guest' is chosen as primary user.
          specify "-e TARANTOOL_USER_NAME=username" and
          pick a user name other than "guest".
 ****************************************************]]
-        print(warn_str)
-    end
+                print(warn_str)
+            end
 
-    if user_name == 'guest' and user_password ~= nil then
-        user_password = nil
+            if user_name == 'guest' and user_password ~= nil then
+                user_password = nil
 
-        warn_str = [[****************************************************
+                warn_str = [[****************************************************
 WARNING: A password for guest user has been specified.
          In Tarantool, guest user can't have a password
          and is always allowed to login, if it has
@@ -127,30 +119,37 @@ WARNING: A password for guest user has been specified.
          specify "-e TARANTOOL_USER_NAME=username" and
          pick a user name other than "guest".
 ****************************************************]]
-        print(warn_str)
-    end
+                print(warn_str)
+            end
 
-    if user_name ~= 'admin' and user_name ~= 'guest' then
-        print(string.format("Creating user '%s'", user_name))
-        box.schema.user.create(user_name)
-    end
+            if user_name ~= 'admin' and user_name ~= 'guest' then
+                print(string.format("Creating user '%s'", user_name))
+                box.schema.user.create(user_name)
+            end
 
-    if user_name ~= 'admin' then
-        print(string.format("Granting admin privileges to user '%s'", user_name))
-        box.schema.user.grant(user_name, 'read,write,execute', 'universe')
-        box.schema.user.grant(user_name, 'replication')
-    end
+            if user_name ~= 'admin' then
+                print(string.format("Granting admin privileges to user '%s'", user_name))
+                box.schema.user.grant(user_name, 'read,write,execute', 'universe')
+                box.schema.user.grant(user_name, 'replication')
+            end
 
-    if user_name ~= 'guest' then
-        box.schema.user.passwd(user_name, user_password)
-    end
+            if user_name ~= 'guest' then
+                box.schema.user.passwd(user_name, user_password)
+            end
+        end
+    end)
+
+    console.listen(CONSOLE_SOCKET_PATH)
+
 end
 
-console.listen(CONSOLE_SOCKET_PATH)
+box.cfg = wrapper_cfg
 
 -- re-run the script passed as parameter with all arguments that follow
 execute_script = arg[1]
-if execute_script ~= nil then
+if execute_script == nil then
+    box.cfg {}
+else
     narg = 0
     while true do
         arg[narg] = arg[narg + 1]
