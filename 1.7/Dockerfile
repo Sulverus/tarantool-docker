@@ -7,8 +7,9 @@ RUN addgroup -S tarantool \
 
 ENV TARANTOOL_VERSION=1.7 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
-    TARANTOOL_COMMIT=076a842 \
-    TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool
+    TARANTOOL_COMMIT=b4a4139 \
+    TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
+    LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz
 
 RUN set -x \
     && apk add --no-cache --virtual .run-deps \
@@ -20,21 +21,26 @@ RUN set -x \
         binutils \
         ncurses \
         libgomp \
-    && apk add --no-cache --virtual .build-deps \
+        lua \
+        curl \
+        lua-dev \
+        musl-dev \
+        make \
         git \
-        perl \
         gcc \
+        tar \
+        zip \
+    && apk add --no-cache --virtual .build-deps \
+        perl \
         g++ \
         cmake \
-        make \
-        tar \
         readline-dev \
         openssl-dev \
         yaml-dev \
         lz4-dev \
         binutils-dev \
         ncurses-dev \
-        libc-dev \
+    && : "---------- tarantool ----------" \
     && mkdir -p /usr/src/tarantool \
     && git clone "$TARANTOOL_DOWNLOAD_URL" /usr/src/tarantool \
     && git -C /usr/src/tarantool checkout "$TARANTOOL_COMMIT" \
@@ -48,9 +54,34 @@ RUN set -x \
              .) \
     && make -C /usr/src/tarantool -j\
     && make -C /usr/src/tarantool install \
-    && rm -r /usr/src/tarantool \
+    && : "---------- small ----------" \
+    && (cd /usr/src/tarantool/src/lib/small; \
+        cmake -DCMAKE_INSTALL_PREFIX=/usr \
+              -DCMAKE_INSTALL_LIBDIR=lib \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              .) \
+    && make -C /usr/src/tarantool/src/lib/small \
+    && make -C /usr/src/tarantool/src/lib/small install \
+    && : "---------- msgpuck ----------" \
+    && (cd /usr/src/tarantool/src/lib/msgpuck; \
+        cmake -DCMAKE_INSTALL_PREFIX=/usr \
+              -DCMAKE_INSTALL_LIBDIR=lib \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              .) \
+    && make -C /usr/src/tarantool/src/lib/msgpuck \
+    && make -C /usr/src/tarantool/src/lib/msgpuck install \
+    && : "---------- luarocks ----------" \
+    && wget -O luarocks.tar.gz "$LUAROCKS_URL" \
+    && mkdir -p /usr/src/luarocks \
+    && tar -xzf luarocks.tar.gz -C /usr/src/luarocks --strip-components=1 \
+    && (cd /usr/src/luarocks; \
+        ./configure; \
+        make build; \
+        make install) \
+    && rm -r /usr/src/luarocks \
     && apk del .build-deps
 
+COPY luarocks-config.lua /usr/local/etc/luarocks/config-5.1.lua
 
 RUN set -x \
     && apk add --no-cache --virtual .run-deps \
@@ -64,70 +95,16 @@ RUN set -x \
         gcc \
         g++ \
         postgresql-dev \
-    && : "---------- expirationd ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/expirationd.git) \
-    && cp -r /usr/src/expirationd/expirationd.lua "$TARANTOOL_INSTALL_LUADIR" \
-    && rm -rf /usr/src/expirationd \
-    && : "---------- queue ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/queue.git) \
-    && mkdir -p "$TARANTOOL_INSTALL_LUADIR/queue/abstract/driver" \
-    && cp -r /usr/src/queue/queue/*.lua "$TARANTOOL_INSTALL_LUADIR/queue" \
-    && cp -r /usr/src/queue/queue/abstract/*.lua \
-             "$TARANTOOL_INSTALL_LUADIR/queue/abstract" \
-    && cp -r /usr/src/queue/queue/abstract/driver/*.lua \
-             "$TARANTOOL_INSTALL_LUADIR/queue/abstract/driver" \
-    && rm -rf /usr/src/queue \
-    && : "---------- http ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/http.git) \
-    && (cd /usr/src/http; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
-    && (cd /usr/src/http; make -j) \
-    && (cd /usr/src/http; make install) \
-    && rm -rf /usr/src/http \
-    && : "---------- connpool ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/connpool.git) \
-    && cp -r /usr/src/connpool/connpool.lua "$TARANTOOL_INSTALL_LUADIR" \
-    && rm -rf /usr/src/connpool \
-    && : "---------- shard ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/shard.git) \
-    && cp -r /usr/src/shard/shard.lua "$TARANTOOL_INSTALL_LUADIR" \
-    && rm -rf /usr/src/shard \
-    && : "---------- msgpuck ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/msgpuck.git) \
-    && (cd /usr/src/msgpuck; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
-    && (cd /usr/src/msgpuck; make -j) \
-    && (cd /usr/src/msgpuck; make install) \
-    && rm -rf /usr/src/cbench \
-    && : "---------- cbench ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/cbench.git) \
-    && (cd /usr/src/cbench; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
-    && (cd /usr/src/cbench; make -j) \
-    && (cd /usr/src/cbench; make install) \
-    && rm -rf /usr/src/cbench \
-    && : "---------- avro ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/tarantool-avro.git) \
-    && (cd /usr/src/tarantool-avro; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
-    && (cd /usr/src/tarantool-avro; make -j) \
-    && (cd /usr/src/tarantool-avro; make install) \
-    && rm -rf /usr/src/tarantool-avro \
-    && : "---------- pg ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/pg.git) \
-    && (cd /usr/src/pg; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
-    && (cd /usr/src/pg; make -j) \
-    && (cd /usr/src/pg; make install) \
-    && rm -rf /usr/src/pg \
-    && : "---------- mysql ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/mysql.git) \
-    && (cd /usr/src/mysql; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
-    && (cd /usr/src/mysql; make -j) \
-    && (cd /usr/src/mysql; make install) \
-    && rm -rf /usr/src/mysql \
-    && : "---------- memcached ----------" \
-    && (cd /usr/src; git clone https://github.com/tarantool/memcached.git) \
-    && git -C /usr/src/memcached submodule update --init --recursive \
-    && (cd /usr/src/memcached; cmake  -DCMAKE_BUILD_TYPE=RelWithDebInfo .) \
-    && (cd /usr/src/memcached; make -j) \
-    && (cd /usr/src/memcached; make install) \
-    && rm -rf /usr/src/memcached \
+    && : "---------- luarocks ----------" \
+    && luarocks install avro-schema \
+    && luarocks install expirationd \
+    && luarocks install queue \
+    && luarocks install connpool \
+    && luarocks install shard \
+    && luarocks install http \
+    && luarocks install pg \
+    && luarocks install mysql \
+    && luarocks install memcached \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps
 
@@ -145,7 +122,6 @@ WORKDIR /opt/tarantool
 
 COPY tarantool-entrypoint.lua /usr/local/bin/
 COPY docker-entrypoint.sh /usr/local/bin/
-COPY console /usr/local/bin/
 
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]
