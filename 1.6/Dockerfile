@@ -5,9 +5,9 @@ RUN addgroup -S tarantool \
     && adduser -S -G tarantool tarantool \
     && apk add --no-cache 'su-exec>=0.2'
 
-ENV TARANTOOL_VERSION=1.6.8.525 \
-    TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool/releases/download/1.6.8.525/tarantool-1.6.8.525.tar.gz \
-    TARANTOOL_DOWNLOAD_SHA1=7b451b8898b3022f37efba461048321f978b8587 \
+ENV TARANTOOL_VERSION=1.6.8.741 \
+    TARANTOOL_DOWNLOAD_URL=https://tarantool.org/dist/1.6/tarantool-1.6.8.741.tar.gz \
+    TARANTOOL_DOWNLOAD_SHA1=8fca24b6f55e753ddce001146ee1c3659ddaf92f \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz
 
@@ -44,6 +44,7 @@ RUN set -x \
     && mkdir -p /usr/src/tarantool \
     && tar -xzf tarantool.tar.gz -C /usr/src/tarantool --strip-components=1 \
     && rm tarantool.tar.gz \
+    && echo "$TARANTOOL_VERSION" > /usr/src/tarantool/VERSION \
     && (cd /usr/src/tarantool; \
        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo\
              -DENABLE_BUNDLED_LIBYAML:BOOL=OFF\
@@ -121,6 +122,7 @@ WORKDIR /opt/tarantool
 
 COPY tarantool-entrypoint.lua /usr/local/bin/
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY tarantool.default /usr/local/etc/default/tarantool
 
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]

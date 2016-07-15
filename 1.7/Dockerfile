@@ -7,7 +7,7 @@ RUN addgroup -S tarantool \
 
 ENV TARANTOOL_VERSION=1.7 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
-    TARANTOOL_COMMIT=b4a4139 \
+    TARANTOOL_COMMIT=71515ae \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz
 
@@ -123,6 +123,7 @@ WORKDIR /opt/tarantool
 
 COPY tarantool-entrypoint.lua /usr/local/bin/
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY tarantool.default /usr/local/etc/default/tarantool
 
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]
