@@ -23,14 +23,10 @@ RUN set -x \
         libgomp \
         lua \
         curl \
-        lua-dev \
-        musl-dev \
-        make \
-        git \
-        gcc \
         tar \
         zip \
     && apk add --no-cache --virtual .build-deps \
+        gcc \
         g++ \
         cmake \
         readline-dev \
@@ -39,6 +35,10 @@ RUN set -x \
         lz4-dev \
         binutils-dev \
         ncurses-dev \
+        lua-dev \
+        musl-dev \
+        make \
+        git \
     && wget -O tarantool.tar.gz "$TARANTOOL_DOWNLOAD_URL" \
     && echo "$TARANTOOL_DOWNLOAD_SHA1 *tarantool.tar.gz" | sha1sum -c - \
     && mkdir -p /usr/src/tarantool \
@@ -53,6 +53,7 @@ RUN set -x \
              .) \
     && make -C /usr/src/tarantool -j \
     && make -C /usr/src/tarantool install \
+    && make -C /usr/src/tarantool clean \
     && : "---------- small ----------" \
     && (cd /usr/src/tarantool/src/lib/small; \
         cmake -DCMAKE_INSTALL_PREFIX=/usr \
@@ -61,6 +62,7 @@ RUN set -x \
               .) \
     && make -C /usr/src/tarantool/src/lib/small \
     && make -C /usr/src/tarantool/src/lib/small install \
+    && make -C /usr/src/tarantool/src/lib/small clean \
     && : "---------- msgpuck ----------" \
     && (cd /usr/src/tarantool/src/lib/msgpuck; \
         cmake -DCMAKE_INSTALL_PREFIX=/usr \
@@ -69,6 +71,7 @@ RUN set -x \
               .) \
     && make -C /usr/src/tarantool/src/lib/msgpuck \
     && make -C /usr/src/tarantool/src/lib/msgpuck install \
+    && make -C /usr/src/tarantool/src/lib/msgpuck clean \
     && : "---------- luarocks ----------" \
     && wget -O luarocks.tar.gz "$LUAROCKS_URL" \
     && mkdir -p /usr/src/luarocks \
@@ -78,6 +81,8 @@ RUN set -x \
         make build; \
         make install) \
     && rm -r /usr/src/luarocks \
+    && rm -rf /usr/src/tarantool \
+    && : "---------- remove build deps ----------" \
     && apk del .build-deps
 
 COPY luarocks-config.lua /usr/local/etc/luarocks/config-5.1.lua
@@ -93,6 +98,8 @@ RUN set -x \
         gcc \
         g++ \
         postgresql-dev \
+        lua-dev \
+        musl-dev \
     && : "---------- luarocks ----------" \
     && luarocks install avro-schema \
     && luarocks install expirationd \
