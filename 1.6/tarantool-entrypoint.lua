@@ -5,6 +5,7 @@ local errno = require('errno')
 local fun = require('fun')
 local urilib = require('uri')
 local console = require('console')
+local term = require('term')
 
 local TARANTOOL_DEFAULT_PORT = 3301
 local CONSOLE_SOCKET_PATH = 'unix/:/var/run/tarantool/tarantool.sock'
@@ -149,6 +150,11 @@ box.cfg = wrapper_cfg
 execute_script = arg[1]
 if execute_script == nil then
     box.cfg {}
+
+    if term.isatty(io.stdout) then
+        console.start()
+        os.exit(0)
+    end
 else
     narg = 0
     while true do
