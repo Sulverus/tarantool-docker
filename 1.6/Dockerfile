@@ -110,6 +110,7 @@ RUN set -x \
     && luarocks install pg \
     && luarocks install mysql \
     && luarocks install memcached \
+    && luarocks install tarantool-prometheus \
     && luarocks install lua-term \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps
