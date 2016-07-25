@@ -14,13 +14,13 @@ local orig_cfg = box.cfg
 
 local function wrapper_cfg(override)
     cfg = {}
-    cfg.slab_alloc_arena = os.getenv('TARANTOOL_SLAB_ALLOC_ARENA') or
+    cfg.slab_alloc_arena = tonumber(os.getenv('TARANTOOL_SLAB_ALLOC_ARENA')) or
         override.slab_alloc_arena
-    cfg.slab_alloc_factor = os.getenv('TARANTOOL_SLAB_ALLOC_FACTOR') or
+    cfg.slab_alloc_factor = tonumber(os.getenv('TARANTOOL_SLAB_ALLOC_FACTOR')) or
         override.slab_alloc_factor
-    cfg.slab_alloc_maximal = os.getenv('TARANTOOL_SLAB_ALLOC_MAXIMAL') or
+    cfg.slab_alloc_maximal = tonumber(os.getenv('TARANTOOL_SLAB_ALLOC_MAXIMAL')) or
         override.slab_alloc_maximal
-    cfg.slab_alloc_minimal = os.getenv('TARANTOOL_SLAB_ALLOC_MINIMAL') or
+    cfg.slab_alloc_minimal = tonumber(os.getenv('TARANTOOL_SLAB_ALLOC_MINIMAL')) or
         override.slab_alloc_minimal
     cfg.listen = tonumber(os.getenv('TARANTOOL_PORT')) or
         override.listen or TARANTOOL_DEFAULT_PORT
