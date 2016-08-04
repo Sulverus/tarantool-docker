@@ -70,7 +70,11 @@ local function wrapper_cfg(override)
         end
     end
 
-    cfg.replication_source = replication_source_table
+    if replication_source then
+        cfg.replication_source = replication_source_table
+    else
+        cfg.replication_source = override.replication_source
+    end
 
     orig_cfg(cfg)
 
