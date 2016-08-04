@@ -123,13 +123,17 @@ RUN mkdir -p /var/lib/tarantool \
     && mkdir -p /opt/tarantool \
     && chown tarantool:tarantool /opt/tarantool \
     && mkdir -p /var/run/tarantool \
-    && chown tarantool:tarantool /var/run/tarantool
+    && chown tarantool:tarantool /var/run/tarantool \
+    && mkdir /etc/tarantool \
+    && chown tarantool:tarantool /etc/tarantool
 
 VOLUME /var/lib/tarantool
 VOLUME /opt/tarantool
+VOLUME /etc/tarantool
 WORKDIR /opt/tarantool
 
 COPY tarantool-entrypoint.lua /usr/local/bin/
+COPY tarantool_set_config.lua /usr/local/bin/
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY tarantool.default /usr/local/etc/default/tarantool
 
