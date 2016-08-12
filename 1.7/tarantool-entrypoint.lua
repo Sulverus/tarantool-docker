@@ -20,7 +20,7 @@ local orig_cfg = box.cfg
 local function read_config()
     local f = io.open(CFG_FILE_PATH, "rb")
     if f == nil then
-        print("Can't open " .. CFG_FILE_PATH ..": ", errno.strerror())
+        log.error("Can't open " .. CFG_FILE_PATH ..": ", errno.strerror())
         os.exit(1)
     end
     local content = f:read("*all")
@@ -139,13 +139,13 @@ local function wrapper_cfg(override)
         cfg.replication_source = override.replication_source
     end
 
-    print("Config:\n" .. yaml.encode(cfg))
+    log.info("Config:\n" .. yaml.encode(cfg))
 
     orig_cfg(cfg)
 
     box.once('tarantool-entrypoint', function ()
         if first_run then
-            print("Initializing database")
+            log.info("Initializing database")
 
             if user_name ~= 'guest' and user_password == nil then
                 user_password = ""
@@ -193,12 +193,12 @@ WARNING: A password for guest user has been specified.
             end
 
             if user_name ~= 'admin' and user_name ~= 'guest' then
-                print(string.format("Creating user '%s'", user_name))
+                log.info("Creating user '%s'", user_name)
                 box.schema.user.create(user_name)
             end
 
             if user_name ~= 'admin' then
-                print(string.format("Granting admin privileges to user '%s'", user_name))
+                log.info("Granting admin privileges to user '%s'", user_name)
                 box.schema.user.grant(user_name, 'read,write,execute', 'universe')
                 box.schema.user.grant(user_name, 'replication')
             end
