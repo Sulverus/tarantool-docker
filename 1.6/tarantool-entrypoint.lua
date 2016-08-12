@@ -79,11 +79,11 @@ end
 
 local function wrapper_cfg(override)
     local work_dir = '/var/lib/tarantool'
-    local snap_filename = "00000000000000000000.snap"
+    local snap_filename = "*.snap"
     local snap_path = work_dir..'/'..snap_filename
 
     local first_run = false
-    if fio.stat(snap_path) == nil and errno() == errno.ENOENT then
+    if next(fio.glob(snap_path)) == nil then
         first_run = true
     end
 
@@ -150,7 +150,7 @@ local function wrapper_cfg(override)
             if user_name ~= 'guest' and user_password == nil then
                 user_password = ""
 
-                warn_str = [[****************************************************
+                local warn_str = [[****************************************************
 WARNING: No password has been set for the database.
          This will allow anyone with access to the
          Tarantool port to access your database. In
@@ -160,11 +160,11 @@ WARNING: No password has been set for the database.
          Use "-e TARANTOOL_USER_PASSWORD=password"
          to set it in "docker run".
 ****************************************************]]
-                print(warn_str)
+                log.warn('\n'..warn_str)
             end
 
             if user_name == 'guest' and user_password == nil then
-                warn_str = [[****************************************************
+                local warn_str = [[****************************************************
 WARNING: 'guest' is chosen as primary user.
          Since it is not allowed to set a password for
          guest user, your instance will be accessible
@@ -174,13 +174,13 @@ WARNING: 'guest' is chosen as primary user.
          specify "-e TARANTOOL_USER_NAME=username" and
          pick a user name other than "guest".
 ****************************************************]]
-                print(warn_str)
+                log.warn('\n'..warn_str)
             end
 
             if user_name == 'guest' and user_password ~= nil then
                 user_password = nil
 
-                warn_str = [[****************************************************
+                local warn_str = [[****************************************************
 WARNING: A password for guest user has been specified.
          In Tarantool, guest user can't have a password
          and is always allowed to login, if it has
@@ -189,7 +189,7 @@ WARNING: A password for guest user has been specified.
          specify "-e TARANTOOL_USER_NAME=username" and
          pick a user name other than "guest".
 ****************************************************]]
-                print(warn_str)
+                log.warn('\n'..warn_str)
             end
 
             if user_name ~= 'admin' and user_name ~= 'guest' then
