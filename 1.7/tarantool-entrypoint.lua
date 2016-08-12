@@ -10,8 +10,10 @@ local log = require('log')
 local yaml = require('yaml')
 
 local TARANTOOL_DEFAULT_PORT = 3301
+local TARANTOOL_DEFAULT_SNAPSHOT_PERIOD = 3600 -- seconds
 local CONSOLE_SOCKET_PATH = 'unix/:/var/run/tarantool/tarantool.sock'
 local CFG_FILE_PATH = '/etc/tarantool/config.yml'
+
 
 local orig_cfg = box.cfg
 
@@ -99,6 +101,7 @@ local function wrapper_cfg(override)
         file_cfg.TARANTOOL_PORT = os.getenv('TARANTOOL_PORT')
         file_cfg.TARANTOOL_WAL_MODE = os.getenv('TARANTOOL_WAL_MODE')
         file_cfg.TARANTOOL_REPLICATION_SOURCE = os.getenv('TARANTOOL_REPLICATION_SOURCE')
+        file_cfg.TARANTOOL_SNAPSHOT_PERIOD = os.getenv('TARANTOOL_SNAPSHOT_PERIOD')
 
         write_config(file_cfg)
     else
@@ -118,6 +121,8 @@ local function wrapper_cfg(override)
         override.listen or TARANTOOL_DEFAULT_PORT
     cfg.wal_mode = file_cfg.TARANTOOL_WAL_MODE or
         override.wal_mode
+    cfg.snapshot_period = tonumber(file_cfg.TARANTOOL_SNAPSHOT_PERIOD) or
+        override.snapshot_period or TARANTOOL_DEFAULT_SNAPSHOT_PERIOD
 
     cfg.wal_dir = override.wal_dir or '/var/lib/tarantool'
     cfg.snap_dir = override.snap_dir or '/var/lib/tarantool'
