@@ -92,6 +92,7 @@ RUN set -x \
     && apk add --no-cache --virtual .run-deps \
         mariadb-client-libs \
         libpq \
+        cyrus-sasl \
     && apk add --no-cache --virtual .build-deps \
         git \
         cmake \
@@ -102,6 +103,7 @@ RUN set -x \
         postgresql-dev \
         lua-dev \
         musl-dev \
+        cyrus-sasl-dev \
     && : "---------- luarocks ----------" \
     && luarocks install avro-schema \
     && luarocks install expirationd \
