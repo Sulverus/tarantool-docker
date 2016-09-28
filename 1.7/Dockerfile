@@ -7,7 +7,7 @@ RUN addgroup -S tarantool \
 
 ENV TARANTOOL_VERSION=1.7 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
-    TARANTOOL_COMMIT=54b3b2d \
+    TARANTOOL_COMMIT=499634d \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz
 
@@ -45,7 +45,6 @@ RUN set -x \
     && git clone "$TARANTOOL_DOWNLOAD_URL" /usr/src/tarantool \
     && git -C /usr/src/tarantool checkout "$TARANTOOL_COMMIT" \
     && git -C /usr/src/tarantool submodule update \
-    && echo "$TARANTOOL_VERSION" > /usr/src/tarantool/VERSION \
     && (cd /usr/src/tarantool; \
        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo\
              -DENABLE_BUNDLED_LIBYAML:BOOL=OFF\
