@@ -5,9 +5,8 @@ RUN addgroup -S tarantool \
     && adduser -S -G tarantool tarantool \
     && apk add --no-cache 'su-exec>=0.2'
 
-ENV TARANTOOL_VERSION=1.7 \
+ENV TARANTOOL_VERSION=1.7.2-1-g92ed6c4 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
-    TARANTOOL_COMMIT=499634d \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz
 
@@ -43,8 +42,8 @@ RUN set -x \
     && : "---------- tarantool ----------" \
     && mkdir -p /usr/src/tarantool \
     && git clone "$TARANTOOL_DOWNLOAD_URL" /usr/src/tarantool \
-    && git -C /usr/src/tarantool checkout "$TARANTOOL_COMMIT" \
-    && git -C /usr/src/tarantool submodule update \
+    && git -C /usr/src/tarantool checkout "$TARANTOOL_VERSION" \
+    && git -C /usr/src/tarantool submodule update --init --recursive \
     && (cd /usr/src/tarantool; \
        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo\
              -DENABLE_BUNDLED_LIBYAML:BOOL=OFF\
