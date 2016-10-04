@@ -91,6 +91,7 @@ RUN set -x \
         mariadb-client-libs \
         libpq \
         cyrus-sasl \
+        libcurl \
     && apk add --no-cache --virtual .build-deps \
         git \
         cmake \
@@ -102,6 +103,7 @@ RUN set -x \
         lua-dev \
         musl-dev \
         cyrus-sasl-dev \
+        curl-dev \
     && : "---------- luarocks ----------" \
     && luarocks install avro-schema \
     && luarocks install expirationd \
@@ -114,6 +116,7 @@ RUN set -x \
     && luarocks install memcached \
     && luarocks install tarantool-prometheus \
     && luarocks install lua-term \
+    && luarocks install tarantool-curl \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps
 
