@@ -128,8 +128,6 @@ RUN mkdir -p /var/lib/tarantool \
     && chown tarantool:tarantool /etc/tarantool
 
 VOLUME /var/lib/tarantool
-VOLUME /opt/tarantool
-VOLUME /etc/tarantool
 WORKDIR /opt/tarantool
 
 COPY tarantool-entrypoint.lua /usr/local/bin/
