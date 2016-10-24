@@ -92,6 +92,7 @@ RUN set -x \
         libpq \
         cyrus-sasl \
         libcurl \
+        mosquitto-libs \
     && apk add --no-cache --virtual .build-deps \
         git \
         cmake \
@@ -104,6 +105,7 @@ RUN set -x \
         musl-dev \
         cyrus-sasl-dev \
         curl-dev \
+        mosquitto-dev \
     && : "---------- luarocks ----------" \
     && luarocks install avro-schema \
     && luarocks install expirationd \
@@ -117,6 +119,7 @@ RUN set -x \
     && luarocks install tarantool-prometheus \
     && luarocks install lua-term \
     && luarocks install tarantool-curl \
+    && luarocks install mqtt \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps
 
