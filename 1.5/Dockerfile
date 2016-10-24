@@ -7,7 +7,7 @@ RUN addgroup -S tarantool \
 
 ENV TARANTOOL_VERSION=1.5.5.27 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
-    TARANTOOL_COMMIT=6aaa31234d1ee2f5e1107ab24508a7875ea4e05a \
+    TARANTOOL_COMMIT=1687c022e7aa93e9c118e1b80e1eac6c429b1010 \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz
 
