@@ -72,6 +72,12 @@ local function update_credentials(console, cfg, value)
     if res ~= nil then
         print(res)
     end
+
+    local replication_source = cfg['TARANTOOL_REPLICATION_SOURCE']
+
+    if replication_source ~= nil then
+        update_replication_source(console, cfg, replication_source)
+    end
 end
 
 

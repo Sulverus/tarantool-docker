@@ -159,8 +159,6 @@ local function wrapper_cfg(override)
         first_run = true
     end
 
-    local user_name = os.getenv('TARANTOOL_USER_NAME') or 'guest'
-    local user_password = os.getenv('TARANTOOL_USER_PASSWORD')
 
     local file_cfg = {}
     local config_file_exists = fio.stat(CFG_FILE_PATH) ~= nil
@@ -184,6 +182,12 @@ local function wrapper_cfg(override)
 
         file_cfg = read_config()
     end
+
+    local user_name = file_cfg.TARANTOOL_USER_NAME or
+        os.getenv('TARANTOOL_USER_NAME') or 'guest'
+    local user_password = file_cfg.TARANTOOL_USER_PASSWORD or
+        os.getenv('TARANTOOL_USER_PASSWORD')
+
 
     local cfg = override or {}
     cfg.slab_alloc_arena = tonumber(file_cfg.TARANTOOL_SLAB_ALLOC_ARENA) or
