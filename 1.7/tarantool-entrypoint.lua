@@ -70,11 +70,83 @@ local function parse_replication_source(replication_source, user_name, user_pass
     return replication_source_table
 end
 
-function set_replication_source(replication_source)
-    local replication_source_table = parse_replication_source(replication_source)
+function set_replication_source(replication_source, user_name, user_password)
+    local replication_source_table =
+        parse_replication_source(replication_source, user_name, user_password)
     box.cfg{replication_source = replication_source_table}
 
     log.info("Updated box.cfg{replication_source} to "..replication_source)
+end
+
+local function create_user(user_name, user_password)
+    if user_name ~= 'guest' and user_password == nil then
+        user_password = ""
+
+        local warn_str = [[****************************************************
+WARNING: No password has been set for the database.
+         This will allow anyone with access to the
+         Tarantool port to access your database. In
+         Docker's default configuration, this is
+         effectively any other container on the same
+         system.
+         Use "-e TARANTOOL_USER_PASSWORD=password"
+         to set it in "docker run".
+****************************************************]]
+        log.warn('\n'..warn_str)
+    end
+
+    if user_name == 'guest' and user_password == nil then
+        local warn_str = [[****************************************************
+WARNING: 'guest' is chosen as primary user.
+         Since it is not allowed to set a password for
+         guest user, your instance will be accessible
+         by anyone having direct access to the Tarantool
+         port.
+         If you wanted to create an authenticated user,
+         specify "-e TARANTOOL_USER_NAME=username" and
+         pick a user name other than "guest".
+****************************************************]]
+        log.warn('\n'..warn_str)
+    end
+
+    if user_name == 'guest' and user_password ~= nil then
+        user_password = nil
+
+        local warn_str = [[****************************************************
+WARNING: A password for guest user has been specified.
+         In Tarantool, guest user can't have a password
+         and is always allowed to login, if it has
+         enough privileges.
+         If you wanted to create an authenticated user,
+         specify "-e TARANTOOL_USER_NAME=username" and
+         pick a user name other than "guest".
+****************************************************]]
+        log.warn('\n'..warn_str)
+    end
+
+    if user_name ~= 'admin' and user_name ~= 'guest' then
+        if not box.schema.user.exists(user_name) then
+            log.info("Creating user '%s'", user_name)
+            box.schema.user.create(user_name)
+        end
+    end
+
+    if user_name ~= 'admin' then
+        log.info("Granting admin privileges to user '%s'", user_name)
+        box.schema.user.grant(user_name, 'read,write,execute',
+                              'universe', nil, {if_not_exists = true})
+        box.schema.user.grant(user_name, 'replication',
+                              nil, nil, {if_not_exists = true})
+    end
+
+    if user_name ~= 'guest' then
+        log.info("Setting password for user '%s'", user_name)
+        box.schema.user.passwd(user_name, user_password)
+    end
+end
+
+function set_credentials(user_name, user_password)
+    create_user(user_name, user_password)
 end
 
 local function wrapper_cfg(override)
@@ -152,65 +224,7 @@ local function wrapper_cfg(override)
         if first_run then
             log.info("Initializing database")
 
-            if user_name ~= 'guest' and user_password == nil then
-                user_password = ""
-
-                local warn_str = [[****************************************************
-WARNING: No password has been set for the database.
-         This will allow anyone with access to the
-         Tarantool port to access your database. In
-         Docker's default configuration, this is
-         effectively any other container on the same
-         system.
-         Use "-e TARANTOOL_USER_PASSWORD=password"
-         to set it in "docker run".
-****************************************************]]
-                log.warn('\n'..warn_str)
-            end
-
-            if user_name == 'guest' and user_password == nil then
-                local warn_str = [[****************************************************
-WARNING: 'guest' is chosen as primary user.
-         Since it is not allowed to set a password for
-         guest user, your instance will be accessible
-         by anyone having direct access to the Tarantool
-         port.
-         If you wanted to create an authenticated user,
-         specify "-e TARANTOOL_USER_NAME=username" and
-         pick a user name other than "guest".
-****************************************************]]
-                log.warn('\n'..warn_str)
-            end
-
-            if user_name == 'guest' and user_password ~= nil then
-                user_password = nil
-
-                local warn_str = [[****************************************************
-WARNING: A password for guest user has been specified.
-         In Tarantool, guest user can't have a password
-         and is always allowed to login, if it has
-         enough privileges.
-         If you wanted to create an authenticated user,
-         specify "-e TARANTOOL_USER_NAME=username" and
-         pick a user name other than "guest".
-****************************************************]]
-                log.warn('\n'..warn_str)
-            end
-
-            if user_name ~= 'admin' and user_name ~= 'guest' then
-                log.info("Creating user '%s'", user_name)
-                box.schema.user.create(user_name)
-            end
-
-            if user_name ~= 'admin' then
-                log.info("Granting admin privileges to user '%s'", user_name)
-                box.schema.user.grant(user_name, 'read,write,execute', 'universe')
-                box.schema.user.grant(user_name, 'replication')
-            end
-
-            if user_name ~= 'guest' then
-                box.schema.user.passwd(user_name, user_password)
-            end
+            create_user(user_name, user_password)
         end
     end)
 

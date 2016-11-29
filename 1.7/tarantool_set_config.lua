@@ -34,8 +34,6 @@ local function nop(console, cfg, value)
 end
 
 local function update_replication_source(console, cfg, value)
-    local cmd = ""
-
     local user_name = "nil"
     if cfg['TARANTOOL_USER_NAME'] then
         user_name = "'" .. cfg['TARANTOOL_USER_NAME'] .. "'"
@@ -46,15 +44,36 @@ local function update_replication_source(console, cfg, value)
         user_password = "'" .. cfg['TARANTOOL_USER_PASSWORD'] .. "'"
     end
 
-    cmd = "set_replication_source('"..value.."', " .. user_name .. "," .. user_password .. ")"
+    local cmd = "set_replication_source('"..value.."', " .. user_name .. "," .. user_password .. ")"
     print("cmd: ", cmd)
 
-    res = console:eval(cmd)
+    local res = console:eval(cmd)
 
     if res ~= nil then
         print(res)
     end
 end
+
+local function update_credentials(console, cfg, value)
+    local user_name = "nil"
+    if cfg['TARANTOOL_USER_NAME'] then
+        user_name = "'" .. cfg['TARANTOOL_USER_NAME'] .. "'"
+    end
+
+    local user_password = "nil"
+    if cfg['TARANTOOL_USER_PASSWORD'] then
+        user_password = "'" .. cfg['TARANTOOL_USER_PASSWORD'] .. "'"
+    end
+
+    local cmd = "set_credentials(" .. user_name .. "," .. user_password .. ")"
+
+    local res = console:eval(cmd)
+
+    if res ~= nil then
+        print(res)
+    end
+end
+
 
 local vars = {
     TARANTOOL_SLAB_ALLOC_ARENA=nop,
@@ -63,8 +82,8 @@ local vars = {
     TARANTOOL_SLAB_ALLOC_MINIMAL=nop,
     TARANTOOL_PORT=nop,
     TARANTOOL_WAL_MODE=nop,
-    TARANTOOL_USER_NAME=nop,
-    TARANTOOL_USER_PASSWORD=nop,
+    TARANTOOL_USER_NAME=update_credentials,
+    TARANTOOL_USER_PASSWORD=update_credentials,
     TARANTOOL_REPLICATION_SOURCE=update_replication_source
 }
 
