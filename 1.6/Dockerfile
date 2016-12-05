@@ -103,6 +103,26 @@ RUN set -x \
         cyrus-sasl-dev \
         curl-dev \
         mosquitto-dev \
+    && : "---------- proj (for gis module) ----------" \
+    && wget -O proj.tar.gz http://download.osgeo.org/proj/proj-4.9.3.tar.gz \
+    && mkdir -p /usr/src/proj \
+    && tar -xzf proj.tar.gz -C /usr/src/proj --strip-components=1 \
+    && (cd /usr/src/proj; \
+        ./configure; \
+        make; \
+        make install) \
+    && rm -r /usr/src/proj \
+    && rm -rf /usr/src/proj \
+    && : "---------- geos (for gis module) ----------" \
+    && wget -O geos.tar.bz2 http://download.osgeo.org/geos/geos-3.6.0.tar.bz2 \
+    && mkdir -p /usr/src/geos \
+    && tar -xjf geos.tar.bz2 -C /usr/src/geos --strip-components=1 \
+    && (cd /usr/src/geos; \
+        ./configure; \
+        make; \
+        make install) \
+    && rm -r /usr/src/geos \
+    && rm -rf /usr/src/geos \
     && : "---------- luarocks ----------" \
     && luarocks install avro-schema \
     && luarocks install expirationd \
@@ -117,6 +137,7 @@ RUN set -x \
     && luarocks install lua-term \
     && luarocks install tarantool-curl \
     && luarocks install mqtt \
+    && luarocks install tarantool-gis \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps
 
