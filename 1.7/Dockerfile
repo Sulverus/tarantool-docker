@@ -154,6 +154,7 @@ RUN set -x \
     && rm -r /usr/src/geos \
     && rm -rf /usr/src/geos \
     && : "---------- luarocks ----------" \
+    && luarocks install lua-term \
     && : "avro" \
     && git clone $LUAROCK_AVRO_SCHEMA_REPO /rocks/avro \
     && git -C /rocks/avro checkout $LUAROCK_AVRO_SCHEMA_TAG \
