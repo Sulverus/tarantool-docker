@@ -5,7 +5,7 @@ RUN addgroup -S tarantool \
     && adduser -S -G tarantool tarantool \
     && apk add --no-cache 'su-exec>=0.2'
 
-ENV TARANTOOL_VERSION=1.7.2-287-g085f6e4 \
+ENV TARANTOOL_VERSION=1.7.3-32-g0dd09b1 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz \
@@ -26,7 +26,7 @@ ENV TARANTOOL_VERSION=1.7.2-287-g085f6e4 \
     LUAROCK_MYSQL_REPO=https://github.com/tarantool/mysql.git \
     LUAROCK_MYSQL_TAG=1c15d30 \
     LUAROCK_MEMCACHED_REPO=https://github.com/tarantool/memcached.git \
-    LUAROCK_MEMCACHED_TAG=c927626 \
+    LUAROCK_MEMCACHED_TAG=ba18746 \
     LUAROCK_TARANTOOL_PROMETHEUS_REPO=https://github.com/tarantool/prometheus.git \
     LUAROCK_TARANTOOL_PROMETHEUS_TAG=0654304 \
     LUAROCK_TARANTOOL_CURL_REPO=https://github.com/tarantool/curl.git \
