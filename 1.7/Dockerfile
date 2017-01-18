@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:3.5
 MAINTAINER mail@racktear.com
 
 RUN addgroup -S tarantool \
@@ -14,7 +14,7 @@ ENV TARANTOOL_VERSION=1.7.3-32-g0dd09b1 \
     LUAROCK_EXPIRATIOND_REPO=https://github.com/tarantool/expirationd.git \
     LUAROCK_EXPIRATIOND_TAG=9ec22b6 \
     LUAROCK_QUEUE_REPO=https://github.com/tarantool/queue.git \
-    LUAROCK_QUEUE_TAG=9796515 \
+    LUAROCK_QUEUE_TAG=24d730c \
     LUAROCK_CONNPOOL_REPO=https://github.com/tarantool/connpool.git \
     LUAROCK_CONNPOOL_TAG=685af44 \
     LUAROCK_SHARD_REPO=https://github.com/tarantool/shard.git \
