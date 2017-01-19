@@ -227,6 +227,7 @@ WORKDIR /opt/tarantool
 COPY tarantool-entrypoint.lua /usr/local/bin/
 COPY tarantool_set_config.lua /usr/local/bin/
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY console /usr/local/bin/
 COPY tarantool_is_up /usr/local/bin/
 COPY tarantool.default /usr/local/etc/default/tarantool
 
