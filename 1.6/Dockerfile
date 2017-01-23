@@ -8,6 +8,8 @@ RUN addgroup -S tarantool \
 ENV TARANTOOL_VERSION=1.6.9-11-gf4619d0 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
+    GPERFTOOLS_REPO=https://github.com/gperftools/gperftools.git \
+    GPERFTOOLS_TAG=gperftools-2.5 \
     LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz \
     LUAROCK_AVRO_SCHEMA_REPO=https://github.com/tarantool/avro-schema.git \
     LUAROCK_AVRO_SCHEMA_TAG=b49efa8 \
@@ -34,7 +36,11 @@ ENV TARANTOOL_VERSION=1.6.9-11-gf4619d0 \
     LUAROCK_MQTT_REPO=https://github.com/tarantool/mqtt.git \
     LUAROCK_MQTT_TAG=238fd2e \
     LUAROCK_TARANTOOL_GIS_REPO=https://github.com/tarantool/gis.git \
-    LUAROCK_TARANTOOL_GIS_TAG=25209fc
+    LUAROCK_TARANTOOL_GIS_TAG=25209fc \
+    LUAROCK_GPERFTOOLS_REPO=https://github.com/tarantool/gperftools.git \
+    LUAROCK_GPERFTOOLS_TAG=12a7ac2
+
+COPY gperftools_alpine.diff /
 
 RUN set -x \
     && apk add --no-cache --virtual .run-deps \
@@ -64,6 +70,23 @@ RUN set -x \
         musl-dev \
         make \
         git \
+        libunwind-dev \
+        autoconf \
+        automake \
+        libtool \
+        linux-headers \
+    && : "---------- gperftools ----------" \
+    && mkdir -p /usr/src/gperftools \
+    && git clone "$GPERFTOOLS_REPO" /usr/src/gperftools \
+    && git -C /usr/src/gperftools checkout "$GPERFTOOLS_TAG" \
+    && (cd /usr/src/gperftools; \
+        patch -p1 < /gperftools_alpine.diff; \
+        rm /gperftools_alpine.diff; \
+        ./autogen.sh; \
+        ./configure; \
+        make; \
+        cp .libs/libprofiler.so* /usr/local/lib;) \
+    && : "---------- tarantool ----------" \
     && mkdir -p /usr/src/tarantool \
     && git clone "$TARANTOOL_DOWNLOAD_URL" /usr/src/tarantool \
     && git -C /usr/src/tarantool checkout "$TARANTOOL_VERSION" \
@@ -105,6 +128,7 @@ RUN set -x \
         make install) \
     && rm -r /usr/src/luarocks \
     && rm -rf /usr/src/tarantool \
+    && rm -rf /usr/src/gperftools \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps
 
@@ -203,6 +227,10 @@ RUN set -x \
     && git clone $LUAROCK_TARANTOOL_GIS_REPO /rocks/gis \
     && git -C /rocks/gis checkout $LUAROCK_TARANTOOL_GIS_TAG \
     && (cd /rocks/gis && luarocks make *rockspec) \
+    && : "gperftools" \
+    && git clone $LUAROCK_GPERFTOOLS_REPO /rocks/gperftools \
+    && git -C /rocks/gperftools checkout $LUAROCK_GPERFTOOLS_TAG \
+    && (cd /rocks/gperftools && luarocks make *rockspec) \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps
 
