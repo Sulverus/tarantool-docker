@@ -77,6 +77,7 @@ RUN set -x \
         automake \
         libtool \
         linux-headers \
+        go \
     && : "---------- gperftools ----------" \
     && mkdir -p /usr/src/gperftools \
     && git clone "$GPERFTOOLS_REPO" /usr/src/gperftools \
@@ -88,6 +89,8 @@ RUN set -x \
         ./configure; \
         make; \
         cp .libs/libprofiler.so* /usr/local/lib;) \
+    && (GOPATH=/usr/src/go go get github.com/google/pprof; \
+        cp /usr/src/go/bin/pprof /usr/local/bin) \
     && : "---------- tarantool ----------" \
     && mkdir -p /usr/src/tarantool \
     && git clone "$TARANTOOL_DOWNLOAD_URL" /usr/src/tarantool \
@@ -131,6 +134,7 @@ RUN set -x \
     && rm -r /usr/src/luarocks \
     && rm -rf /usr/src/tarantool \
     && rm -rf /usr/src/gperftools \
+    && rm -rf /usr/src/go \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps
 
@@ -238,7 +242,6 @@ RUN set -x \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps \
     && rm -rf /rocks
-
 
 RUN mkdir -p /var/lib/tarantool \
     && chown tarantool:tarantool /var/lib/tarantool \
