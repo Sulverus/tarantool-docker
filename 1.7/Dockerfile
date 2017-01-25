@@ -265,5 +265,7 @@ COPY tarantool.default /usr/local/etc/default/tarantool
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]
 
+HEALTHCHECK CMD tarantool_is_up
+
 EXPOSE 3301
 CMD [ "tarantool" ]
