@@ -32,7 +32,7 @@ ENV TARANTOOL_VERSION=1.6.9-11-gf4619d0 \
     LUAROCK_TARANTOOL_PROMETHEUS_REPO=https://github.com/tarantool/prometheus.git \
     LUAROCK_TARANTOOL_PROMETHEUS_TAG=0654304 \
     LUAROCK_TARANTOOL_CURL_REPO=https://github.com/tarantool/curl.git \
-    LUAROCK_TARANTOOL_CURL_TAG=900b3fd \
+    LUAROCK_TARANTOOL_CURL_TAG=2.2.3 \
     LUAROCK_MQTT_REPO=https://github.com/tarantool/mqtt.git \
     LUAROCK_MQTT_TAG=238fd2e \
     LUAROCK_TARANTOOL_GIS_REPO=https://github.com/tarantool/gis.git \
@@ -145,6 +145,7 @@ RUN set -x \
         cyrus-sasl \
         libcurl \
         mosquitto-libs \
+        libev \
     && apk add --no-cache --virtual .build-deps \
         git \
         cmake \
@@ -157,6 +158,7 @@ RUN set -x \
         cyrus-sasl-dev \
         curl-dev \
         mosquitto-dev \
+        libev-dev \
     && : "---------- proj (for gis module) ----------" \
     && wget -O proj.tar.gz http://download.osgeo.org/proj/proj-4.9.3.tar.gz \
     && mkdir -p /usr/src/proj \
