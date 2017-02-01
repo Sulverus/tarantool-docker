@@ -56,20 +56,20 @@ is only one Tarantool instance running in the container.
 
 # What's on board
 
-- avro: Apache Avro scheme for your data
-- expirationd: Automatically delete tuples based on expiration time
-- queue: Priority queues with TTL and confirmations
-- connpool: Keep a pool of connections to other Tarantool instances
-- shard: Automatically distribute data across multiple instances
-- http: Embedded HTTP server with flask-style routing support
-- curl: HTTP client based on libcurl
-- pg: Query PostgreSQL right from Tarantool
-- mysql: Query MySql right from Tarantool
-- memcached: Access Tarantool as if it was a Memcached instance
-- prometheus: Instrument code and export metrics to Prometheus monitoring
-- mqtt: Client for MQTT message brokers
-- gis: store and query geospatial data
-- gperftools: collect CPU profile to find bottlenecks in your code
+- [avro](https://github.com/tarantool/avro-schema): Apache Avro scheme for your data
+- [expirationd](https://github.com/tarantool/expirationd): Automatically delete tuples based on expiration time
+- [queue](https://github.com/tarantool/queue): Priority queues with TTL and confirmations
+- [connpool](https://github.com/tarantool/connpool): Keep a pool of connections to other Tarantool instances
+- [shard](https://github.com/tarantool/shard): Automatically distribute data across multiple instances
+- [http](https://github.com/tarantool/http): Embedded HTTP server with flask-style routing support
+- [curl](https://github.com/tarantool/curl): HTTP client based on libcurl
+- [pg](https://github.com/tarantool/pg): Query PostgreSQL right from Tarantool
+- [mysql](https://github.com/tarantool/mysql): Query MySql right from Tarantool
+- [memcached](https://github.com/tarantool/memcached): Access Tarantool as if it was a Memcached instance
+- [prometheus](https://github.com/tarantool/prometheus): Instrument code and export metrics to Prometheus monitoring
+- [mqtt](https://github.com/tarantool/mqtt): Client for MQTT message brokers
+- [gis](https://github.com/tarantool/gis): store and query geospatial data
+- [gperftools](https://github.com/tarantool/gperftools): collect CPU profile to find bottlenecks in your code
 
 If the module you need is not listed here, there is a good chance we may add it. Open an issue [on our GitHub](https://github.com/tarantool/docker).
 
