@@ -26,9 +26,9 @@ ENV TARANTOOL_VERSION=1.7.3-843-g571b1c19e \
     LUAROCK_PG_REPO=https://github.com/tarantool/pg.git \
     LUAROCK_PG_TAG=8bb4164 \
     LUAROCK_MYSQL_REPO=https://github.com/tarantool/mysql.git \
-    LUAROCK_MYSQL_TAG=e2c9187 \
+    LUAROCK_MYSQL_TAG=3203633 \
     LUAROCK_MEMCACHED_REPO=https://github.com/tarantool/memcached.git \
-    LUAROCK_MEMCACHED_TAG=ba18746 \
+    LUAROCK_MEMCACHED_TAG=04623e5 \
     LUAROCK_TARANTOOL_PROMETHEUS_REPO=https://github.com/tarantool/prometheus.git \
     LUAROCK_TARANTOOL_PROMETHEUS_TAG=0654304 \
     LUAROCK_TARANTOOL_CURL_REPO=https://github.com/tarantool/curl.git \
@@ -219,10 +219,6 @@ RUN set -x \
     && git clone $LUAROCK_MYSQL_REPO /rocks/mysql \
     && git -C /rocks/mysql checkout $LUAROCK_MYSQL_TAG \
     && (cd /rocks/mysql && luarocks make *rockspec) \
-    && : "memcached" \
-    && git clone $LUAROCK_MEMCACHED_REPO /rocks/memcached \
-    && git -C /rocks/memcached checkout $LUAROCK_MEMCACHED_TAG \
-    && (cd /rocks/memcached && luarocks make *rockspec) \
     && : "prometheus" \
     && git clone $LUAROCK_TARANTOOL_PROMETHEUS_REPO /rocks/prometheus \
     && git -C /rocks/prometheus checkout $LUAROCK_TARANTOOL_PROMETHEUS_TAG \
