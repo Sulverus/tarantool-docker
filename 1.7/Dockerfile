@@ -5,7 +5,7 @@ RUN addgroup -S tarantool \
     && adduser -S -G tarantool tarantool \
     && apk add --no-cache 'su-exec>=0.2'
 
-ENV TARANTOOL_VERSION=1.7.4-0-g927bd9c24 \
+ENV TARANTOOL_VERSION=1.7.4-105-g9183c1557 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     GPERFTOOLS_REPO=https://github.com/gperftools/gperftools.git \
@@ -20,7 +20,7 @@ ENV TARANTOOL_VERSION=1.7.4-0-g927bd9c24 \
     LUAROCK_CONNPOOL_REPO=https://github.com/tarantool/connpool.git \
     LUAROCK_CONNPOOL_TAG=685af44 \
     LUAROCK_SHARD_REPO=https://github.com/tarantool/shard.git \
-    LUAROCK_SHARD_TAG=278b906 \
+    LUAROCK_SHARD_TAG=1caf6b8 \
     LUAROCK_HTTP_REPO=https://github.com/tarantool/http.git \
     LUAROCK_HTTP_TAG=67d8a9b \
     LUAROCK_PG_REPO=https://github.com/tarantool/pg.git \
