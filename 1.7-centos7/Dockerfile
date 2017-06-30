@@ -4,7 +4,7 @@ MAINTAINER mail@racktear.com
 RUN groupadd tarantool \
     && adduser -g tarantool tarantool
 
-ENV TARANTOOL_VERSION=1.7.4-105-g9183c1557 \
+ENV TARANTOOL_VERSION=1.7.4-224-g246a89efd \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     GPERFTOOLS_REPO=https://github.com/gperftools/gperftools.git \
@@ -58,6 +58,7 @@ RUN set -x \
         tar \
         zip \
         libunwind \
+        libcurl \
     && yum -y install \
         perl \
         gcc-c++ \
@@ -77,6 +78,7 @@ RUN set -x \
         libtool \
         go \
         wget \
+        curl-devel \
     && : "---------- gperftools ----------" \
     && mkdir -p /usr/src/gperftools \
     && git clone "$GPERFTOOLS_REPO" /usr/src/gperftools \
@@ -151,7 +153,14 @@ RUN set -x \
         automake \
         libtool \
         go \
-        wget
+        wget \
+        perl \
+        kernel-headers \
+        golang-src \
+        curl-devel \
+    && rpm -qa | grep devel | xargs yum -y remove \
+    && rm -rf /var/cache/yum
+
 
 COPY luarocks-config.lua /usr/local/etc/luarocks/config-5.1.lua
 COPY mosquitto.repo /etc/yum.repos.d/
@@ -258,7 +267,12 @@ RUN set -x \
         wget \
         proj-devel \
         geos-devel \
-        openssl-devel
+        openssl-devel \
+        perl \
+        kernel-headers \
+        golang-src \
+    && rpm -qa | grep devel | xargs yum -y remove \
+    && rm -rf /var/cache/yum
 
 
 RUN set -x \
