@@ -5,7 +5,7 @@ RUN addgroup -S tarantool \
     && adduser -S -G tarantool tarantool \
     && apk add --no-cache 'su-exec>=0.2'
 
-ENV TARANTOOL_VERSION=1.7.4-105-g9183c1557 \
+ENV TARANTOOL_VERSION=1.7.4-224-g246a89efd \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     GPERFTOOLS_REPO=https://github.com/gperftools/gperftools.git \
@@ -46,7 +46,7 @@ RUN set -x \
     && apk add --no-cache --virtual .run-deps \
         libstdc++ \
         readline \
-        openssl \
+        libressl \
         yaml \
         lz4 \
         binutils \
@@ -57,13 +57,14 @@ RUN set -x \
         tar \
         zip \
         libunwind \
+        libcurl \
     && apk add --no-cache --virtual .build-deps \
         perl \
         gcc \
         g++ \
         cmake \
         readline-dev \
-        openssl-dev \
+        libressl-dev \
         yaml-dev \
         lz4-dev \
         binutils-dev \
@@ -78,6 +79,7 @@ RUN set -x \
         libtool \
         linux-headers \
         go \
+        curl-dev \
     && : "---------- gperftools ----------" \
     && mkdir -p /usr/src/gperftools \
     && git clone "$GPERFTOOLS_REPO" /usr/src/gperftools \
@@ -145,7 +147,6 @@ RUN set -x \
         mariadb-client-libs \
         libpq \
         cyrus-sasl \
-        libcurl \
         mosquitto-libs \
         libev \
     && apk add --no-cache --virtual .build-deps \
