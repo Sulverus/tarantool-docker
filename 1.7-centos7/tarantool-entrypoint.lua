@@ -207,6 +207,7 @@ local function wrapper_cfg(override)
 
     cfg.wal_dir = override.wal_dir or '/var/lib/tarantool'
     cfg.snap_dir = override.snap_dir or '/var/lib/tarantool'
+    cfg.vinyl_dir = override.vinyl_dir or '/var/lib/tarantool'
     cfg.pid_file = override.pid_file or '/var/run/tarantool/tarantool.pid'
 
     local replication_source = file_cfg.TARANTOOL_REPLICATION_SOURCE
