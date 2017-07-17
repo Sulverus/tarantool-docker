@@ -4,7 +4,7 @@ MAINTAINER mail@racktear.com
 RUN groupadd tarantool \
     && adduser -g tarantool tarantool
 
-ENV TARANTOOL_VERSION=1.7.4-294-g54d06d7bf \
+ENV TARANTOOL_VERSION=1.7.4-298-g5a8243d53 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     GPERFTOOLS_REPO=https://github.com/gperftools/gperftools.git \
