@@ -20,7 +20,7 @@ update_cfg()
 
 try_init_db()
 {
-    if [ "$(find . -maxdepth 1 -name '/var/lib/tarantool/*.snap' -print)" = "" ]
+    if [ "$(find /var/lib/tarantool -maxdepth 1 -name '*.snap' -print)" = "" ]
     then
         echo "Initializing config:"
 
