@@ -33,6 +33,8 @@ try_init_db()
             echo "primary_port=3301" >> $CFG
             echo "admin_port=3305" >> $CFG
             echo "replication_port=3310" >> $CFG
+            echo "snap_dir=/var/lib/tarantool" >> $CFG
+            echo "wal_dir=/var/lib/tarantool" >> $CFG
         fi
 
         update_cfg "replication_port" "TARANTOOL_REPLICATION_PORT"
@@ -43,6 +45,8 @@ try_init_db()
         update_cfg "primary_port" "TARANTOOL_PORT"
         update_cfg "admin_port" "TARANTOOL_ADMIN_PORT"
         update_cfg "wal_mode" "TARANTOOL_WAL_MODE"
+        update_cfg "snap_dir" "TARANTOOL_SNAP_DIR"
+        update_cfg "wal_dir" "TARANTOOL_WAL_DIR"
 
         cat $CFG
 
