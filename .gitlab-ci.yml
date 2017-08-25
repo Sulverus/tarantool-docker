@@ -1,0 +1,35 @@
+stages:
+ - build
+ - release
+
+variables:
+  REGISTRY: registry.gitlab.com
+  IMAGE: ${REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}
+
+before_script:
+ # Enable GitLab registry
+ - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} ${REGISTRY}
+
+#
+# Build Docker image and publish as IMAGE:BRANCH
+#
+docker-build:
+  stage: build
+  variables:
+    TAG: 1.7-centos7
+  script:
+   - docker build -t ${IMAGE}:${TAG}-${CI_COMMIT_REF_SLUG} ${TAG}/
+   - docker push ${IMAGE}:${TAG}-${CI_COMMIT_REF_SLUG}
+
+#
+# Tag IMAGE:BRANCH as image:latest for release branches (master)
+#
+docker-tag:
+  stage: release
+  variables:
+    TAG: 1.7-centos7
+  script:
+   - docker tag ${IMAGE}:${TAG}-${CI_COMMIT_REF_SLUG} ${IMAGE}:${TAG}
+   - docker push ${IMAGE}:${TAG}
+  only:
+   - master
