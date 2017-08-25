@@ -7,8 +7,6 @@ RUN groupadd tarantool \
 ENV TARANTOOL_VERSION=1.7.5-0-g24b70de10 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
-    GPERFTOOLS_REPO=https://github.com/gperftools/gperftools.git \
-    GPERFTOOLS_TAG=gperftools-2.5 \
     LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz \
     LUAROCK_AVRO_SCHEMA_REPO=https://github.com/tarantool/avro-schema.git \
     LUAROCK_AVRO_SCHEMA_TAG=b49efa8 \
@@ -80,14 +78,7 @@ RUN set -x \
         wget \
         curl-devel \
     && : "---------- gperftools ----------" \
-    && mkdir -p /usr/src/gperftools \
-    && git clone "$GPERFTOOLS_REPO" /usr/src/gperftools \
-    && (cd /usr/src/gperftools; git checkout "$GPERFTOOLS_TAG";) \
-    && (cd /usr/src/gperftools; \
-        ./autogen.sh; \
-        ./configure; \
-        make; \
-        cp .libs/libprofiler.so* /usr/local/lib;) \
+    && yum install -y gperftools-libs \
     && (GOPATH=/usr/src/go go get github.com/google/pprof; \
         cp /usr/src/go/bin/pprof /usr/local/bin) \
     && : "---------- tarantool ----------" \
@@ -132,7 +123,6 @@ RUN set -x \
         make install) \
     && rm -r /usr/src/luarocks \
     && rm -rf /usr/src/tarantool \
-    && rm -rf /usr/src/gperftools \
     && rm -rf /usr/src/go \
     && : "---------- remove build deps ----------" \
     && yum -y remove \
