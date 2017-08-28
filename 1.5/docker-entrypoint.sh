@@ -31,7 +31,7 @@ try_init_db()
             echo "work_dir=/opt/tarantool" > $CFG
             echo "memcached_port=11211" >> $CFG
             echo "primary_port=3301" >> $CFG
-            echo "admin_port=3305" >> $CFG
+            echo "admin_port=3302" >> $CFG
             echo "replication_port=3310" >> $CFG
             echo "snap_dir=/var/lib/tarantool" >> $CFG
             echo "wal_dir=/var/lib/tarantool" >> $CFG
