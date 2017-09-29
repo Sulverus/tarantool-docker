@@ -10,7 +10,6 @@ local log = require('log')
 local yaml = require('yaml')
 
 local TARANTOOL_DEFAULT_PORT = 3301
-local TARANTOOL_DEFAULT_CHECKPOINT_INTERVAL = 3600 -- seconds
 local CONSOLE_SOCKET_PATH = 'unix/:/var/run/tarantool/tarantool.sock'
 local CFG_FILE_PATH = '/etc/tarantool/config.yml'
 
@@ -212,6 +211,8 @@ local function wrapper_cfg(override)
         override.slab_alloc_maximal
     cfg.slab_alloc_minimal = tonumber(file_cfg.TARANTOOL_SLAB_ALLOC_MINIMAL) or
         override.slab_alloc_minimal
+    cfg.snapshot_period = tonumber(file_cfg.TARANTOOL_SNAPSHOT_PERIOD) or
+        override.snapshot_period
     -- Replacements for deprecated options
     cfg.memtx_memory = tonumber(file_cfg.TARANTOOL_MEMTX_MEMORY) or
         override.memtx_memory
@@ -219,13 +220,11 @@ local function wrapper_cfg(override)
         override.memtx_min_tuple_size
     cfg.memtx_max_tuple_size = tonumber(file_cfg.TARANTOOL_MEMTX_MAX_TUPLE_SIZE) or
         override.memtx_max_tuple_size
+    cfg.checkpoint_interval = tonumber(file_cfg.TARANTOOL_CHECKPOINT_INTERVAL) or
+        override.checkpoint_interval
     -- Deprecated options with default values
     local choice = choose_option('memtx_dir', 'snap_dir', override)
     cfg[choice] = override[choice] or '/var/lib/tarantool'
-    local choice = choose_option('checkpoint_interval', 'snapshot_period', override)
-    local choice2 = choose_option('TARANTOOL_CHECKPOINT_INTERVAL', 'TARANTOOL_SNAPSHOT_PERIOD', file_cfg)
-    cfg[choice] = tonumber(file_cfg[choice2]) or override[choice] or
-        TARANTOOL_DEFAULT_CHECKPOINT_INTERVAL
 
     -- Remaining configuration
     cfg.slab_alloc_factor = tonumber(file_cfg.TARANTOOL_SLAB_ALLOC_FACTOR) or
