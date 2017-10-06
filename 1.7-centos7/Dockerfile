@@ -185,6 +185,7 @@ RUN set -x \
     && mkdir -p /rocks \
     && : "---------- luarocks ----------" \
     && luarocks install lua-term \
+    && luarocks install ldoc \
     && : "avro" \
     && git clone $LUAROCK_AVRO_SCHEMA_REPO /rocks/avro \
     && (cd /rocks/avro; git checkout $LUAROCK_AVRO_SCHEMA_TAG) \

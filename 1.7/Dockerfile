@@ -186,6 +186,7 @@ RUN set -x \
     && rm -rf /usr/src/geos \
     && : "---------- luarocks ----------" \
     && luarocks install lua-term \
+    && luarocks install ldoc \
     && : "avro" \
     && git clone $LUAROCK_AVRO_SCHEMA_REPO /rocks/avro \
     && git -C /rocks/avro checkout $LUAROCK_AVRO_SCHEMA_TAG \
