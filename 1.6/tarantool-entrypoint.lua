@@ -10,7 +10,7 @@ local log = require('log')
 local yaml = require('yaml')
 
 local TARANTOOL_DEFAULT_PORT = 3301
-local TARANTOOL_DEFAULT_CHECKPOINT_INTERVAL = 3600 -- seconds
+local TARANTOOL_DEFAULT_SNAPSHOT_PERIOD = 3600 -- seconds
 local CONSOLE_SOCKET_PATH = 'unix/:/var/run/tarantool/tarantool.sock'
 local CFG_FILE_PATH = '/etc/tarantool/config.yml'
 
@@ -149,16 +149,6 @@ function set_credentials(user_name, user_password)
     create_user(user_name, user_password)
 end
 
-local function choose_option(main, substitute, cfg)
-    if cfg[main] then
-        return main
-    end
-    if cfg[substitute] then
-        return substitute
-    end
-    return main
-end
-
 local function wrapper_cfg(override)
     local work_dir = '/var/lib/tarantool'
     local snap_filename = "*.snap"
@@ -184,12 +174,7 @@ local function wrapper_cfg(override)
         file_cfg.TARANTOOL_PORT = os.getenv('TARANTOOL_PORT')
         file_cfg.TARANTOOL_WAL_MODE = os.getenv('TARANTOOL_WAL_MODE')
         file_cfg.TARANTOOL_REPLICATION_SOURCE = os.getenv('TARANTOOL_REPLICATION_SOURCE')
-        file_cfg.TARANTOOL_REPLICATION = os.getenv('TARANTOOL_REPLICATION')
         file_cfg.TARANTOOL_SNAPSHOT_PERIOD = os.getenv('TARANTOOL_SNAPSHOT_PERIOD')
-        file_cfg.TARANTOOL_MEMTX_MEMORY = os.getenv('TARANTOOL_MEMTX_MEMORY')
-        file_cfg.TARANTOOL_CHECKPOINT_INTERVAL = os.getenv('TARANTOOL_CHECKPOINT_INTERVAL')
-        file_cfg.TARANTOOL_MEMTX_MIN_TUPLE_SIZE = os.getenv('TARANTOOL_MEMTX_MIN_TUPLE_SIZE')
-        file_cfg.TARANTOOL_MEMTX_MAX_TUPLE_SIZE = os.getenv('TARANTOOL_MEMTX_MAX_TUPLE_SIZE')
 
         write_config(file_cfg)
     else
@@ -205,49 +190,34 @@ local function wrapper_cfg(override)
 
 
     local cfg = override or {}
-    -- Placeholders for deprecated options
     cfg.slab_alloc_arena = tonumber(file_cfg.TARANTOOL_SLAB_ALLOC_ARENA) or
         override.slab_alloc_arena
+    cfg.slab_alloc_factor = tonumber(file_cfg.TARANTOOL_SLAB_ALLOC_FACTOR) or
+        override.slab_alloc_factor
     cfg.slab_alloc_maximal = tonumber(file_cfg.TARANTOOL_SLAB_ALLOC_MAXIMAL) or
         override.slab_alloc_maximal
     cfg.slab_alloc_minimal = tonumber(file_cfg.TARANTOOL_SLAB_ALLOC_MINIMAL) or
         override.slab_alloc_minimal
-    -- Replacements for deprecated options
-    cfg.memtx_memory = tonumber(file_cfg.TARANTOOL_MEMTX_MEMORY) or
-        override.memtx_memory
-    cfg.memtx_min_tuple_size = tonumber(file_cfg.TARANTOOL_MEMTX_MIN_TUPLE_SIZE) or
-        override.memtx_min_tuple_size
-    cfg.memtx_max_tuple_size = tonumber(file_cfg.TARANTOOL_MEMTX_MAX_TUPLE_SIZE) or
-        override.memtx_max_tuple_size
-    -- Deprecated options with default values
-    local choice = choose_option('memtx_dir', 'snap_dir', override)
-    cfg[choice] = override[choice] or '/var/lib/tarantool'
-    local choice = choose_option('checkpoint_interval', 'snapshot_period', override)
-    local choice2 = choose_option('TARANTOOL_CHECKPOINT_INTERVAL', 'TARANTOOL_SNAPSHOT_PERIOD', file_cfg)
-    cfg[choice] = tonumber(file_cfg[choice2]) or override[choice] or
-        TARANTOOL_DEFAULT_CHECKPOINT_INTERVAL
-
-    -- Remaining configuration
-    cfg.slab_alloc_factor = tonumber(file_cfg.TARANTOOL_SLAB_ALLOC_FACTOR) or
-        override.slab_alloc_factor
     cfg.listen = tonumber(file_cfg.TARANTOOL_PORT) or
         override.listen or TARANTOOL_DEFAULT_PORT
     cfg.wal_mode = file_cfg.TARANTOOL_WAL_MODE or
         override.wal_mode
+    cfg.snapshot_period = tonumber(file_cfg.TARANTOOL_SNAPSHOT_PERIOD) or
+        override.snapshot_period or TARANTOOL_DEFAULT_SNAPSHOT_PERIOD
 
     cfg.wal_dir = override.wal_dir or '/var/lib/tarantool'
+    cfg.snap_dir = override.snap_dir or '/var/lib/tarantool'
     cfg.pid_file = override.pid_file or '/var/run/tarantool/tarantool.pid'
 
-    local choice = choose_option('TARANTOOL_REPLICATION', 'TARANTOOL_REPLICATION_SOURCE', file_cfg)
-    local replication_source_table = parse_replication_source(file_cfg[choice],
+    local replication_source = file_cfg.TARANTOOL_REPLICATION_SOURCE
+    local replication_source_table = parse_replication_source(replication_source,
                                                               user_name,
                                                               user_password)
 
     if replication_source then
-        cfg.replication = replication_source_table
+        cfg.replication_source = replication_source_table
     else
-        local choice = choose_option('replication', 'replication_source', override)
-        cfg[choice] = override[choice]
+        cfg.replication_source = override.replication_source
     end
 
     log.info("Config:\n" .. yaml.encode(cfg))
