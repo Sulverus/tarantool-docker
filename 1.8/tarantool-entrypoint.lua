@@ -243,7 +243,7 @@ local function wrapper_cfg(override)
                                                               user_name,
                                                               user_password)
 
-    if replication_source then
+    if replication_source_table then
         cfg.replication = replication_source_table
     else
         local choice = choose_option('replication', 'replication_source', override)
