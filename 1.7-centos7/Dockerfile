@@ -4,7 +4,7 @@ MAINTAINER mail@racktear.com
 RUN groupadd tarantool \
     && adduser -g tarantool tarantool
 
-ENV TARANTOOL_VERSION=1.7.5-0-g24b70de10 \
+ENV TARANTOOL_VERSION=1.7.5-250-g8c55b4993 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz \
@@ -57,6 +57,7 @@ RUN set -x \
         zip \
         libunwind \
         libcurl \
+        libicu \
     && yum -y install \
         perl \
         gcc-c++ \
@@ -77,6 +78,7 @@ RUN set -x \
         go \
         wget \
         curl-devel \
+        libicu-devel \
     && : "---------- gperftools ----------" \
     && yum install -y gperftools-libs \
     && (GOPATH=/usr/src/go go get github.com/google/pprof; \
@@ -148,6 +150,7 @@ RUN set -x \
         kernel-headers \
         golang-src \
         curl-devel \
+        libicu-devel \
     && rpm -qa | grep devel | xargs yum -y remove \
     && rm -rf /var/cache/yum
 

@@ -5,7 +5,7 @@ RUN addgroup -S tarantool \
     && adduser -S -G tarantool tarantool \
     && apk add --no-cache 'su-exec>=0.2'
 
-ENV TARANTOOL_VERSION=1.8.1-415-ge3d2485c7 \
+ENV TARANTOOL_VERSION=1.8.2-279-gbecd1e826 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     GPERFTOOLS_REPO=https://github.com/gperftools/gperftools.git \
@@ -58,6 +58,7 @@ RUN set -x \
         zip \
         libunwind \
         libcurl \
+        icu \
     && apk add --no-cache --virtual .build-deps \
         perl \
         gcc \
@@ -81,6 +82,7 @@ RUN set -x \
         go \
         tcl \
         curl-dev \
+        icu-dev \
     && : "---------- gperftools ----------" \
     && mkdir -p /usr/src/gperftools \
     && git clone "$GPERFTOOLS_REPO" /usr/src/gperftools \
