@@ -90,7 +90,8 @@ local vars = {
     TARANTOOL_WAL_MODE=nop,
     TARANTOOL_USER_NAME=update_credentials,
     TARANTOOL_USER_PASSWORD=update_credentials,
-    TARANTOOL_REPLICATION_SOURCE=update_replication_source
+    TARANTOOL_REPLICATION_SOURCE=update_replication_source,
+    TARANTOOL_REPLICATION=update_replication_source,
 }
 
 console.on_start(function(self)

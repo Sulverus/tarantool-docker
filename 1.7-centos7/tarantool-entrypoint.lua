@@ -69,12 +69,23 @@ local function parse_replication_source(replication_source, user_name, user_pass
     return replication_source_table
 end
 
-function set_replication_source(replication_source, user_name, user_password)
-    local replication_source_table =
-        parse_replication_source(replication_source, user_name, user_password)
-    box.cfg{replication_source = replication_source_table}
+local function choose_option(main, substitute, cfg)
+    if cfg[main] then
+        return main
+    end
+    if cfg[substitute] then
+        return substitute
+    end
+    return main
+end
 
-    log.info("Updated box.cfg{replication_source} to "..replication_source)
+function set_replication_source(replication_source, user_name, user_password)
+    local replication_source_table = parse_replication_source(
+        replication_source, user_name, user_password
+    )
+    local choice = choose_option('replication', 'replication_source', box.cfg)
+    box.cfg{[choice] = replication_source_table}
+    log.info("Updated box.cfg.%s to %s", choice, replication_source)
 end
 
 local function create_user(user_name, user_password)
@@ -146,16 +157,6 @@ end
 
 function set_credentials(user_name, user_password)
     create_user(user_name, user_password)
-end
-
-local function choose_option(main, substitute, cfg)
-    if cfg[main] then
-        return main
-    end
-    if cfg[substitute] then
-        return substitute
-    end
-    return main
 end
 
 local function wrapper_cfg(override)
@@ -243,7 +244,7 @@ local function wrapper_cfg(override)
                                                               user_name,
                                                               user_password)
 
-    if replication_source then
+    if replication_source_table then
         cfg.replication = replication_source_table
     else
         local choice = choose_option('replication', 'replication_source', override)
