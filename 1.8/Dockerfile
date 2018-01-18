@@ -29,8 +29,7 @@ ENV TARANTOOL_VERSION=1.8.2-279-gbecd1e826 \
     LUAROCK_MYSQL_TAG=3203633 \
     LUAROCK_MEMCACHED_REPO=https://github.com/tarantool/memcached.git \
     LUAROCK_MEMCACHED_TAG=7aa78b2 \
-    LUAROCK_TARANTOOL_PROMETHEUS_REPO=https://github.com/tarantool/prometheus.git \
-    LUAROCK_TARANTOOL_PROMETHEUS_TAG=0654304 \
+    LUAROCK_TARANTOOL_PROMETHEUS_VERSION=1.0.0 \
     LUAROCK_TARANTOOL_CURL_REPO=https://github.com/tarantool/curl.git \
     LUAROCK_TARANTOOL_CURL_TAG=2.2.7 \
     LUAROCK_MQTT_REPO=https://github.com/tarantool/mqtt.git \
@@ -229,9 +228,7 @@ RUN set -x \
     && git -C /rocks/memcached checkout $LUAROCK_MEMCACHED_TAG \
     && (cd /rocks/memcached && luarocks make *rockspec) \
     && : "prometheus" \
-    && git clone $LUAROCK_TARANTOOL_PROMETHEUS_REPO /rocks/prometheus \
-    && git -C /rocks/prometheus checkout $LUAROCK_TARANTOOL_PROMETHEUS_TAG \
-    && (cd /rocks/prometheus && luarocks make *rockspec) \
+    && luarocks install prometheus $LUAROCK_TARANTOOL_PROMETHEUS_VERSION \
     && : "curl" \
     && git clone $LUAROCK_TARANTOOL_CURL_REPO /rocks/curl \
     && git -C /rocks/curl checkout $LUAROCK_TARANTOOL_CURL_TAG \
