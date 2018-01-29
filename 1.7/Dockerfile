@@ -10,34 +10,22 @@ ENV TARANTOOL_VERSION=1.7.6-11-gcd17b77f9 \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     GPERFTOOLS_REPO=https://github.com/gperftools/gperftools.git \
     GPERFTOOLS_TAG=gperftools-2.5 \
-    LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases/luarocks-2.3.0.tar.gz \
-    LUAROCK_AVRO_SCHEMA_REPO=https://github.com/tarantool/avro-schema.git \
-    LUAROCK_AVRO_SCHEMA_TAG=b49efa8 \
-    LUAROCK_EXPIRATIOND_REPO=https://github.com/tarantool/expirationd.git \
-    LUAROCK_EXPIRATIOND_TAG=9ec22b6 \
-    LUAROCK_QUEUE_REPO=https://github.com/tarantool/queue.git \
-    LUAROCK_QUEUE_TAG=24d730c \
-    LUAROCK_CONNPOOL_REPO=https://github.com/tarantool/connpool.git \
-    LUAROCK_CONNPOOL_TAG=89c2fe4 \
+    LUAROCKS_URL=https://github.com/tarantool/luarocks/archive/6e6fe62d9409fe2103c0fd091cccb3da0451faf5.tar.gz \
     LUAROCK_SHARD_REPO=https://github.com/tarantool/shard.git \
     LUAROCK_SHARD_TAG=8f8c5a7 \
-    LUAROCK_HTTP_REPO=https://github.com/tarantool/http.git \
-    LUAROCK_HTTP_TAG=67d8a9b \
-    LUAROCK_PG_REPO=https://github.com/tarantool/pg.git \
-    LUAROCK_PG_TAG=8bb4164 \
-    LUAROCK_MYSQL_REPO=https://github.com/tarantool/mysql.git \
-    LUAROCK_MYSQL_TAG=3203633 \
-    LUAROCK_MEMCACHED_REPO=https://github.com/tarantool/memcached.git \
-    LUAROCK_MEMCACHED_TAG=7aa78b2 \
+    LUAROCK_AVRO_SCHEMA_VERSION=2.0.1 \
+    LUAROCK_EXPERATIOND_VERSION=1.0.1 \
+    LUAROCK_QUEUE_VERSION=1.0.2 \
+    LUAROCK_CONNPOOL_VERSION=1.1.1 \
+    LUAROCK_HTTP_VERSION=1.0.1 \
+    LUAROCK_MEMCACHED_VERSION=1.0.0 \
+    LUAROCK_TARANTOOL_PG_VERSION=2.0.1 \
+    LUAROCK_TARANTOOL_MYSQL_VERSION=2.0.1 \
+    LUAROCK_TARANTOOL_CURL_VERSION=2.3.1 \
+    LUAROCK_TARANTOOL_MQTT_VERSION=1.2.1 \
+    LUAROCK_TARANTOOL_GIS_VERSION=1.0.0 \
     LUAROCK_TARANTOOL_PROMETHEUS_VERSION=1.0.0 \
-    LUAROCK_TARANTOOL_CURL_REPO=https://github.com/tarantool/curl.git \
-    LUAROCK_TARANTOOL_CURL_TAG=2.2.7 \
-    LUAROCK_MQTT_REPO=https://github.com/tarantool/mqtt.git \
-    LUAROCK_MQTT_TAG=238fd2e \
-    LUAROCK_TARANTOOL_GIS_REPO=https://github.com/tarantool/gis.git \
-    LUAROCK_TARANTOOL_GIS_TAG=25209fc \
-    LUAROCK_GPERFTOOLS_REPO=https://github.com/tarantool/gperftools.git \
-    LUAROCK_GPERFTOOLS_TAG=12a7ac2
+    LUAROCK_TARANTOOL_GPERFTOOLS_VERSION=1.0.1
 
 COPY gperftools_alpine.diff /
 
@@ -189,59 +177,35 @@ RUN set -x \
     && luarocks install lua-term \
     && luarocks install ldoc \
     && : "avro" \
-    && git clone $LUAROCK_AVRO_SCHEMA_REPO /rocks/avro \
-    && git -C /rocks/avro checkout $LUAROCK_AVRO_SCHEMA_TAG \
-    && (cd /rocks/avro && luarocks make *rockspec) \
+    && luarocks install avro-schema $LUAROCK_AVRO_SCHEMA_VERSION \
     && : "expirationd" \
-    && git clone $LUAROCK_EXPIRATIOND_REPO /rocks/expirationd \
-    && git -C /rocks/expirationd checkout $LUAROCK_EXPIRATIOND_TAG \
-    && (cd /rocks/expirationd && luarocks make *rockspec) \
+    && luarocks install expirationd $LUAROCK_EXPERATIOND_VERSION \
     && : "queue" \
-    && git clone $LUAROCK_QUEUE_REPO /rocks/queue \
-    && git -C /rocks/queue checkout $LUAROCK_QUEUE_TAG \
-    && (cd /rocks/queue && luarocks make *rockspec) \
+    && luarocks install queue $LUAROCK_QUEUE_VERSION \
     && : "connpool" \
-    && git clone $LUAROCK_CONNPOOL_REPO /rocks/connpool \
-    && git -C /rocks/connpool checkout $LUAROCK_CONNPOOL_TAG \
-    && (cd /rocks/connpool && luarocks make *rockspec) \
+    && luarocks install connpool $LUAROCK_CONNPOOL_VERSION \
     && : "shard" \
     && git clone $LUAROCK_SHARD_REPO /rocks/shard \
     && git -C /rocks/shard checkout $LUAROCK_SHARD_TAG \
     && (cd /rocks/shard && luarocks make *rockspec) \
     && : "http" \
-    && git clone $LUAROCK_HTTP_REPO /rocks/http \
-    && git -C /rocks/http checkout $LUAROCK_HTTP_TAG \
-    && (cd /rocks/http && luarocks make *rockspec) \
+    && luarocks install http $LUAROCK_HTTP_VERSION \
     && : "pg" \
-    && git clone $LUAROCK_PG_REPO /rocks/pg \
-    && git -C /rocks/pg checkout $LUAROCK_PG_TAG \
-    && (cd /rocks/pg && luarocks make *rockspec) \
+    && luarocks install pg $LUAROCK_TARANTOOL_PG_VERSION \
     && : "mysql" \
-    && git clone $LUAROCK_MYSQL_REPO /rocks/mysql \
-    && git -C /rocks/mysql checkout $LUAROCK_MYSQL_TAG \
-    && (cd /rocks/mysql && luarocks make *rockspec) \
+    && luarocks install mysql $LUAROCK_TARANTOOL_MYSQL_VERSION \
     && : "memcached" \
-    && git clone $LUAROCK_MEMCACHED_REPO /rocks/memcached \
-    && git -C /rocks/memcached checkout $LUAROCK_MEMCACHED_TAG \
-    && (cd /rocks/memcached && luarocks make *rockspec) \
+    && luarocks install memcached $LUAROCK_MEMCACHED_VERSION \
     && : "prometheus" \
     && luarocks install prometheus $LUAROCK_TARANTOOL_PROMETHEUS_VERSION \
     && : "curl" \
-    && git clone $LUAROCK_TARANTOOL_CURL_REPO /rocks/curl \
-    && git -C /rocks/curl checkout $LUAROCK_TARANTOOL_CURL_TAG \
-    && (cd /rocks/curl && luarocks make *rockspec) \
+    && luarocks install tarantool-curl $LUAROCK_TARANTOOL_CURL_VERSION \
     && : "mqtt" \
-    && git clone $LUAROCK_MQTT_REPO /rocks/mqtt \
-    && git -C /rocks/mqtt checkout $LUAROCK_MQTT_TAG \
-    && (cd /rocks/mqtt && luarocks make *rockspec) \
+    && luarocks install mqtt $LUAROCK_TARANTOOL_MQTT_VERSION \
     && : "gis" \
-    && git clone $LUAROCK_TARANTOOL_GIS_REPO /rocks/gis \
-    && git -C /rocks/gis checkout $LUAROCK_TARANTOOL_GIS_TAG \
-    && (cd /rocks/gis && luarocks make *rockspec) \
+    && luarocks install gis $LUAROCK_TARANTOOL_GIS_VERSION \
     && : "gperftools" \
-    && git clone $LUAROCK_GPERFTOOLS_REPO /rocks/gperftools \
-    && git -C /rocks/gperftools checkout $LUAROCK_GPERFTOOLS_TAG \
-    && (cd /rocks/gperftools && luarocks make *rockspec) \
+    && luarocks install gperftools $LUAROCK_TARANTOOL_GPERFTOOLS_VERSION \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps \
     && rm -rf /rocks
