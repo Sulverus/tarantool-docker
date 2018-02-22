@@ -5,7 +5,7 @@ RUN addgroup -S tarantool \
     && adduser -S -G tarantool tarantool \
     && apk add --no-cache 'su-exec>=0.2'
 
-ENV TARANTOOL_VERSION=1.8.2-279-gbecd1e826 \
+ENV TARANTOOL_VERSION=1.9.0 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     GPERFTOOLS_REPO=https://github.com/gperftools/gperftools.git \
@@ -67,7 +67,6 @@ RUN set -x \
         libtool \
         linux-headers \
         go \
-        tcl \
         curl-dev \
         icu-dev \
     && : "---------- gperftools ----------" \
@@ -137,7 +136,6 @@ RUN set -x \
         mariadb-client-libs \
         libpq \
         cyrus-sasl \
-        libcurl \
         mosquitto-libs \
         libev \
     && apk add --no-cache --virtual .build-deps \
@@ -154,7 +152,6 @@ RUN set -x \
         curl-dev \
         mosquitto-dev \
         libev-dev \
-        libressl-dev \
     && mkdir -p /rocks \
     && : "---------- proj (for gis module) ----------" \
     && wget -O proj.tar.gz http://download.osgeo.org/proj/proj-4.9.3.tar.gz \
