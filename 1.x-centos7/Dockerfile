@@ -4,13 +4,13 @@ MAINTAINER mail@racktear.com
 RUN groupadd tarantool \
     && adduser -g tarantool tarantool
 
-ENV TARANTOOL_VERSION=1.7.6-11-gcd17b77f9 \
+ENV TARANTOOL_VERSION=1.9.1-11-gcd17b77f9 \
     TARANTOOL_DOWNLOAD_URL=https://github.com/tarantool/tarantool.git \
     TARANTOOL_INSTALL_LUADIR=/usr/local/share/tarantool \
     LUAROCKS_URL=https://github.com/tarantool/luarocks/archive/6e6fe62d9409fe2103c0fd091cccb3da0451faf5.tar.gz \
     LUAROCK_SHARD_REPO=https://github.com/tarantool/shard.git \
     LUAROCK_SHARD_TAG=8f8c5a7 \
-    LUAROCK_AVRO_SCHEMA_VERSION=2.0.1 \
+    LUAROCK_CHECKS_VERSION=1.0.0 \
     LUAROCK_EXPERATIOND_VERSION=1.0.1 \
     LUAROCK_QUEUE_VERSION=1.0.2 \
     LUAROCK_CONNPOOL_VERSION=1.1.1 \
@@ -177,6 +177,8 @@ RUN set -x \
     && : "---------- luarocks ----------" \
     && luarocks install lua-term \
     && luarocks install ldoc \
+    && : "checks" \
+    && luarocks install checks $LUAROCK_CHECKS_VERSION \
     && : "avro" \
     && luarocks install avro-schema $LUAROCK_AVRO_SCHEMA_VERSION \
     && : "expirationd" \
