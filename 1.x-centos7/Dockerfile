@@ -20,7 +20,6 @@ ENV TARANTOOL_VERSION=1.10.1-258-ge39b4c193 \
     LUAROCK_TARANTOOL_PG_VERSION=2.0.1 \
     LUAROCK_TARANTOOL_MYSQL_VERSION=2.0.1 \
     LUAROCK_TARANTOOL_CURL_VERSION=2.3.1 \
-    LUAROCK_TARANTOOL_MQTT_VERSION=1.2.1 \
     LUAROCK_TARANTOOL_GIS_VERSION=1.0.0 \
     LUAROCK_TARANTOOL_PROMETHEUS_VERSION=1.0.0 \
     LUAROCK_TARANTOOL_GPERFTOOLS_VERSION=1.0.1
@@ -145,7 +144,6 @@ RUN set -x \
 
 
 COPY luarocks-config.lua /usr/local/etc/luarocks/config-5.1.lua
-COPY mosquitto.repo /etc/yum.repos.d/
 
 RUN set -x \
     && yum -y install https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-redhat96-9.6-3.noarch.rpm \
@@ -154,7 +152,6 @@ RUN set -x \
         postgresql96-libs \
         cyrus-sasl \
         libcurl \
-        libmosquitto1 \
         libev \
         proj \
         geos \
@@ -168,7 +165,6 @@ RUN set -x \
         lua-devel \
         cyrus-sasl-devel \
         curl-devel \
-        libmosquitto-devel \
         libev-devel \
         wget \
         proj-devel \
@@ -204,8 +200,6 @@ RUN set -x \
     && luarocks install prometheus $LUAROCK_TARANTOOL_PROMETHEUS_VERSION \
     && : "curl" \
     && luarocks install tarantool-curl $LUAROCK_TARANTOOL_CURL_VERSION \
-    && : "mqtt" \
-    && luarocks install mqtt $LUAROCK_TARANTOOL_MQTT_VERSION \
     && : "gis" \
     && luarocks install gis $LUAROCK_TARANTOOL_GIS_VERSION \
     && : "gperftools" \
@@ -221,7 +215,6 @@ RUN set -x \
         lua-devel \
         cyrus-sasl-devel \
         curl-devel \
-        libmosquitto-devel \
         libev-devel \
         wget \
         proj-devel \
