@@ -18,19 +18,19 @@ controlled fail-over, and executing Lua code triggered by database
 events. Remote database instances are accessible transparently via a
 remote-procedure-invocation API.
 
-For more information, visit [tarantool.org](http://tarantool.org).
+For more information, visit [tarantool.io](https://tarantool.io).
 
 # Quickstart
 
 If you just want to quickly try out tarantool, run this command:
 
 ```console
-$ docker run --rm -t -i tarantool/tarantool:1.7
+$ docker run --rm -t -i tarantool/tarantool
 ```
 
 This will create a one-off Tarantool instance and open an interactive
 console. From there you can either type `tutorial()` or follow
-[official documentation](https://tarantool.org/doc/book/index.html).
+[official documentation](https://tarantool.io/en/doc/1.10/).
 
 
 # About this image
@@ -56,7 +56,7 @@ is only one Tarantool instance running in the container.
 
 # What's on board
 
-- [avro](https://github.com/tarantool/avro-schema): Apache Avro scheme for your data
+- [avro-schema](https://github.com/tarantool/avro-schema): Apache Avro scheme for your data
 - [expirationd](https://github.com/tarantool/expirationd): Automatically delete tuples based on expiration time
 - [queue](https://github.com/tarantool/queue): Priority queues with TTL and confirmations
 - [connpool](https://github.com/tarantool/connpool): Keep a pool of connections to other Tarantool instances
@@ -97,12 +97,12 @@ If the module you need is not listed here, there is a good chance we may add it.
 ## Start a Tarantool instance
 
 ```console
-$ docker run --name mytarantool -p3301:3301 -d tarantool/tarantool:1.7
+$ docker run --name mytarantool -p3301:3301 -d tarantool/tarantool
 ```
 
-This will start an instance of Tarantool 1.7 and expose it on
-port 3301. Note, that by default there is no password protection, so
-don't expose this instance to the outside world.
+This will start an instance of Tarantool and expose it on
+port 3301. Note, that by default there is no password protection,
+so don't expose this instance to the outside world.
 
 In this case, when there is no lua code provided, the entry point
 script initializes database using a sane set of defaults. Some of them
@@ -111,10 +111,10 @@ can be tuned with environment variables (see below).
 ## Start a secure Tarantool instance
 
 ```console
-$ docker run --name mytarantool -p3301:3301 -e TARANTOOL_USER_NAME=myusername -e TARANTOOL_USER_PASSWORD=mysecretpassword -d tarantool/tarantool:1.7
+$ docker run --name mytarantool -p3301:3301 -e TARANTOOL_USER_NAME=myusername -e TARANTOOL_USER_PASSWORD=mysecretpassword -d tarantool/tarantool
 ```
 
-This starts an instance of Tarantool 1.7, disables guest login and
+This starts an instance of Tarantool, disables guest login and
 creates user named `myusername` with admin privileges and password
 `mysecretpassword`.
 
@@ -149,7 +149,7 @@ version: '2'
 
 services:
   tarantool1:
-    image: tarantool/tarantool:1.7
+    image: tarantool/tarantool:1.10.2
     environment:
       TARANTOOL_REPLICATION_SOURCE: "tarantool1,tarantool2"
     networks:
@@ -158,7 +158,7 @@ services:
       - "3301:3301"
 
   tarantool2:
-    image: tarantool/tarantool:1.7
+    image: tarantool/tarantool:1.10.2
     environment:
       TARANTOOL_REPLICATION_SOURCE: "tarantool1,tarantool2"
     networks:
@@ -183,7 +183,7 @@ The simplest way to provide application code is to mount your code
 directory to `/opt/tarantool`:
 
 ```console
-$ docker run --name mytarantool -p3301:3301 -d -v /path/to/my/app:/opt/tarantool tarantool/tarantool:1.7 tarantool /opt/tarantool/app.lua
+$ docker run --name mytarantool -p3301:3301 -d -v /path/to/my/app:/opt/tarantool tarantool/tarantool tarantool /opt/tarantool/app.lua
 ```
 
 Where `/path/to/my/app` is a host directory containing lua code. Note
@@ -198,7 +198,7 @@ If you want to pack and distribute an image with your code, you may
 create your own Dockerfile as follows:
 
 ```bash
-FROM tarantool/tarantool:1.7
+FROM tarantool/tarantool:1.10.2
 COPY app.lua /opt/tarantool
 CMD ["tarantool", "/opt/tarantool/app.lua"]
 ```
@@ -238,45 +238,46 @@ Tarantool. In the above example, it is set to "mysecretpassword".
 Optional. Specifying this variable will tell Tarantool to listen for
 incoming connections on a specific port. Default is 3301.
 
-### `TARANTOOL_REPLICATION_SOURCE`
+### `TARANTOOL_REPLICATION`
 
 Optional. Comma-separated list of URIs to treat as replication
-sources. Upon the start, Tarantool will attempt to connect to those
-instances, fetch the data snapshot and start replicating transaction
-logs. In other words, it will become a slave. For the multi-master
-configuration, other participating instances of Tarantool should be
-started with the same TARANTOOL_REPLICATION_SOURCE. (NB: applicable
-only to 1.7)
+sources. Upon the start, Tarantool will attempt to connect to
+those instances, fetch the data snapshot and start replicating
+transaction logs. In other words, it will become a slave. For the
+multi-master configuration, other participating instances of
+Tarantool should be started with the same TARANTOOL_REPLICATION.
+(NB: applicable only to >=1.7)
 
 Example:
 
 `user1:pass@host1:3301,user2:pass@host2:3301`
 
-### `TARANTOOL_SLAB_ALLOC_ARENA`
+### `TARANTOOL_MEMTX_MEMORY`
 
-Optional. Specifies how much memory Tarantool allocates to actually
-store tuples, in gigabytes. When the limit is reached, INSERT or
-UPDATE requests begin failing. Default is 1.0.
+Optional. Specifies how much memory Tarantool allocates to
+actually store tuples, in bytes. When the limit is reached, INSERT
+or UPDATE requests begin failing. Default is 268435456 (256
+megabytes).
 
 ### `TARANTOOL_SLAB_ALLOC_FACTOR`
 
 Optional. Used as the multiplier for computing the sizes of memory
 chunks that tuples are stored in. A lower value may result in less
-wasted memory depending on the total amount of memory available and
-the distribution of item sizes. Default is 1.1.
+wasted memory depending on the total amount of memory available
+and the distribution of item sizes. Default is 1.05.
 
-### `TARANTOOL_SLAB_ALLOC_MAXIMAL`
+### `TARANTOOL_MEMTX_MAX_TUPLE_SIZE`
 
 Optional. Size of the largest allocation unit in bytes. It can be
 increased if it is necessary to store large tuples. Default is
 1048576.
 
-### `TARANTOOL_SLAB_ALLOC_MINIMAL`
+### `TARANTOOL_MEMTX_MIN_TUPLE_SIZE`
 
 Optional. Size of the smallest allocation unit, in bytes. It can be
 decreased if most of the tuples are very small. Default is 16.
 
-### `TARANTOOL_SNAPSHOT_PERIOD`
+### `TARANTOOL_CHECKPOINT_INTERVAL`
 
 Optional. Specifies how often snapshots will be made, in seconds.
 Default is 3600 (every 1 hour).
