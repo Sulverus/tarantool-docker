@@ -356,10 +356,10 @@ Rolling versions:
 
 Special builds:
 
-| Docker tag  | Dockerfile              |
-| ----------- | ----------              |
-| 1.x-centos7 | dockerfile/centos_7_1.x |
-| 2.x-centos7 | dockerfile/centos_7_2.x |
+| Docker tag  | Dockerfile          |
+| ----------- | ------------------- |
+| 1.x-centos7 | dockerfile/centos_7 |
+| 2.x-centos7 | dockerfile/centos_7 |
 
 ## How to push changes (for maintainers)
 
