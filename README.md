@@ -367,44 +367,46 @@ Special builds:
 | 1.x-centos7 | dockerfile/centos_7 |
 | 2.x-centos7 | dockerfile/centos_7 |
 
-## How to push changes (for maintainers)
+## Release policy
 
-When the change is about specific tarantool version or versions
-range, update all relevant fixed versions & rolling versions
-according to the pipelines listed above.
+All images are pushed to [Docker Hub](docker_hub_tags).
 
-When the change is about the environment at all, all versions
-need to be updated.
+Fixed version tags (`x.y.z`) are frozen: we never update them.
 
-Add a new release (say, x.y.z). Create / update rolling
-versions x and x.y in master, create fixed version x.y.z.
+Rolling versions are updated to the last fixed version tags:
 
-A maintainer is responsible to check updated images.
+- `x.y` == `x.y.<last-z>` (`==` means 'points to the same image')
+- `1` == `1.<last-y>.<last-z>`
+- `2` == `2.<last-y>.<last-z>`
+- `latest` == `2`
 
-[1]: https://tarantool.io/en/doc/1.9/dev_guide/release_management/#how-to-make-a-minor-release
+Special builds (CentOS) are updated with the same policy as rolling versions:
 
-## How to push images (for maintainers)
-Gitlab-CI jobs after the images builds push it to its local
-images repository in the format:
-    registry.gitlab.com/tarantool/docker:<tag>
-To push collected images into the 'docker.io' repository with
-the following format:
-    docker.io/tarantool/tarantool:<tag>
-the following scripts can be used:
+- `1.x-centos7` image offers a last `1.<last-y>.<last-z>` release
+- `2.x-centos7` image offers a last `2.<last-y>.<last-z>` release
 
-```bash
-echo List of available tags: \
-    `grep " VER: " .gitlab-ci.yml | awk -F"'" '{print $2}'`
+[docker_hub_tags]: https://hub.docker.com/r/tarantool/tarantool/tags
+
+### Exceptional cases
+
+As an exception we can deliver an important update for the existing tarantool
+release within `x.y.z-r1`, `x.y.z-r2`, ... tags.
+
+When `x.y.z-r<N>` is released, the corresponding rolling releases (`x.y`, `x`
+and `latest` if `x` == 2) should be updated to point to the same image.
+
+There is no strict policy, which updates should be considered important. Let's
+decide on demand and define the policy later.
+
+TBD: How to notify users about the exceptional updates?
+
+## How to push an image (for maintainers)
+
+Example:
+
+```console
+$ export TAG=2
+$ export OS=alpine DIST=3.9 VER=2.x  # double check the values!
+$ PORT=5200 make -f .gitlab.mk build
+$ docker push tarantool/tarantool:${TAG}
 ```
-
-```bash
-for tag in <list of tags> ; do \
-    echo "============= $tag ==============" ; \
-    docker pull registry.gitlab.com/tarantool/docker:$tag && \
-    docker tag registry.gitlab.com/tarantool/docker:$tag \
-        tarantool/tarantool:$tag && \
-    docker push tarantool/tarantool:$tag ; \
-    echo "$tag push resulted with: $?" ; \
-done
-```
-
