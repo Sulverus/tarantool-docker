@@ -135,6 +135,17 @@ before_script:
     PORT: 5108
     ROCKS_INSTALLER: 'luarocks'
 
+'alpine 3.9 1.10.9':
+  <<: *build_definition
+  when: manual
+  variables:
+    OS: 'alpine'
+    DIST: '3.9'
+    TAG: '1.10.9'
+    VER: '1.10.9'
+    PORT: 5109
+    ROCKS_INSTALLER: 'luarocks'
+
 'alpine 3.9 1.x':
   <<: *build_definition
   variables:
@@ -194,6 +205,7 @@ before_script:
 
 'alpine 3.9 2.1':
   <<: *build_definition
+  when: manual
   variables:
     OS: 'alpine'
     DIST: '3.9'
@@ -248,6 +260,7 @@ before_script:
 
 'alpine 3.9 2.2':
   <<: *build_definition
+  when: manual
   variables:
     OS: 'alpine'
     DIST: '3.9'
@@ -299,6 +312,7 @@ before_script:
 
 'alpine 3.9 2.3':
   <<: *build_definition
+  when: manual
   variables:
     OS: 'alpine'
     DIST: '3.9'
@@ -350,6 +364,7 @@ before_script:
 
 'alpine 3.9 2.4':
   <<: *build_definition
+  when: manual
   variables:
     OS: 'alpine'
     DIST: '3.9'
@@ -389,6 +404,16 @@ before_script:
     VER: '2.5.2'
     PORT: 5253
 
+'alpine 3.9 2.5.3':
+  <<: *build_definition
+  when: manual
+  variables:
+    OS: 'alpine'
+    DIST: '3.9'
+    TAG: '2.5.3'
+    VER: '2.5.3'
+    PORT: 5254
+
 'alpine 3.9 2.5':
   <<: *build_definition
   variables:
@@ -420,6 +445,16 @@ before_script:
     VER: '2.6.1'
     PORT: 5261
 
+'alpine 3.9 2.6.2':
+  <<: *build_definition
+  when: manual
+  variables:
+    OS: 'alpine'
+    DIST: '3.9'
+    TAG: '2.6.2'
+    VER: '2.6.2'
+    PORT: 5262
+
 'alpine 3.9 2.6':
   <<: *build_definition
   variables:
@@ -429,7 +464,7 @@ before_script:
     VER: '2.6'
     PORT: 5269
 
-# Tarantool branch master
+# Tarantool branch 2.7
 
 'alpine 3.9 2.7.0':
   <<: *build_definition
@@ -439,6 +474,37 @@ before_script:
     DIST: '3.9'
     TAG: '2.7.0'
     VER: '2.7.0'
+    PORT: 5270
+
+'alpine 3.9 2.7.1':
+  <<: *build_definition
+  when: manual
+  variables:
+    OS: 'alpine'
+    DIST: '3.9'
+    TAG: '2.7.1'
+    VER: '2.7.1'
+    PORT: 5271
+
+'alpine 3.9 2.7':
+  <<: *build_definition
+  variables:
+    OS: 'alpine'
+    DIST: '3.9'
+    TAG: '2.7'
+    VER: '2.7'
+    PORT: 5279
+
+# Tarantool branch master
+
+'alpine 3.9 2.8.0':
+  <<: *build_definition
+  when: manual
+  variables:
+    OS: 'alpine'
+    DIST: '3.9'
+    TAG: '2.8.0'
+    VER: '2.8.0'
     PORT: 5270
 
 'alpine 3.9 2.x':
