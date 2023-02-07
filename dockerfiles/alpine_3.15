@@ -222,9 +222,9 @@ RUN set -x \
     && : "---------- remove build deps ----------" \
     && apk del .build-deps.2
 
-# gh-170: needed for luarocks
+# gh-170: needed for luarocks and etc
 RUN apk update \
-    && apk add wget git libucontext
+    && apk add wget git libucontext tzdata
 
 RUN mkdir -p /var/lib/tarantool \
     && chown tarantool:tarantool /var/lib/tarantool \
